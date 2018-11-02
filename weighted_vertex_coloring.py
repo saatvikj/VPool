@@ -65,11 +65,15 @@ def get_sorted_nodes(graph):
 		sorted in decreasing order of their weights.
 
 """
-
-	vertices = list(graph.nodes())
 	weights = nx.get_node_attributes(graph, 'weight')
+	weight_sorted_tuple_list = sorted(weights.items(), key=lambda item: item[1], reverse=True)
 
+	sorted_nodes = []
 
+	for i in weight_sorted_tuple_list:
+		sorted_nodes.append(i[0])
+
+	return sorted_nodes
 
 
 

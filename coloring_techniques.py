@@ -18,7 +18,7 @@ def weight_sorted_sequential(graph, vertex_order):
 	Returns:
 		A dictionary containing the color classes of the graph based
 		on the sequential coloring greedy algorithm, dictionary maps
-		color index to list of vertices with that color. 
+		color index to list of vertices with that color.
 
 """
 	assigned_colors = {}
