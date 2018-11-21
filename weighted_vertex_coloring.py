@@ -33,16 +33,16 @@ def create_graph_from_input(filename):
 	input_rows = open(filename).read().split('\n')
 
 	for row in input_rows:
-		adj_matrix.append(row.split(','))
+		adj_matrix.append(row.split(' '))
 
 	data = nx.Graph()
 	for i in range(len(adj_matrix)):
 		data.add_node(i)
 
-	for i,source in adj_matrix:
-		for j,destination in adj_matrix:
-			if not (i == j):
-				data.add_edge(source, destination)
+	for i, source in enumerate(adj_matrix):
+		for j, value in enumerate(source):
+			if value != '' and (i != j) and (int(value) == 1):
+				data.add_edge(i,j)
 
 	nx.set_node_attributes(data, 1, 'weight')
 
@@ -51,7 +51,35 @@ def create_graph_from_input(filename):
 
 
 
-def add_weight_to_vertices(graph, distances, rate):
+def create_rates_for_slabs(filename, slab):
+	"""
+	Create rate matrix according to given slabs
+	by reading distance matrix from the input
+	file.
+
+	Args:
+		filename: File containing distance matrix.
+
+		slab: A dictionary with all but last keys
+		as starting distance of slab and value as
+		list of two elements with first value as
+		base price and second as extra rate per km
+		for that slab.
+
+	Returns:
+		A list of rates for each node in the vertex.
+
+	"""
+	distances = get_distance_to_travel(filename)
+	rates = []
+	for distance in distances:
+		for base in slab:
+			if distance != '' and int(distance) >= base[0] and int(distance) < base[1]:
+				rates.append(slab[base][0] + int(distance)*slab[base][1])
+
+	return rates
+
+def add_weight_to_vertices(graph, rates):
 	"""
 	Take input graph and add weights to corresponding
 	vertices on the basis of the properties of the 
@@ -60,12 +88,8 @@ def add_weight_to_vertices(graph, distances, rate):
 	Args:
 		graph: the networkx graph
 
-		distances: the distance of each node from 
-		destination, weight of nodes will be done
-		on the basis of this distance.
-
-		rate: the rate per kilometer for a passenger
-		in the network.
+		rates: the rate slab for a passenger in the
+		network.
 
 
 	Returns:
@@ -82,12 +106,35 @@ def add_weight_to_vertices(graph, distances, rate):
 	"""
 	nx.set_node_attributes(graph,0,'weight')
 	weights = nx.get_node_attributes(graph, 'weight')
-	for node, distance in enumerate(distances):
-		weights[node] = rate*distance
+	for node, rate in enumerate(rates):
+		weights[node] = rate
 	nx.set_node_attributes(graph, weights, 'weight')
 	return graph
 
 
+
+def get_distance_to_travel(filename):
+	"""
+	Create a list of distances that every passenger
+	has to travel stored in the file.
+
+	Args:
+		filename: The file containing the data
+
+	Returns:
+		List of distances each person has to travel
+		to reach the destination.
+
+	"""
+	
+	distance_matrix = []
+	rows = open(filename).read().split('\n');
+	for row in rows:
+		distance_matrix.append(row.split(' '))
+
+	number_of_people = len(distance_matrix)
+
+	return distance_matrix[number_of_people-1]
 
 def get_sorted_nodes(graph):
 	"""

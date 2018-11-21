@@ -24,19 +24,21 @@ def unpickle_to_file(pickle_file_name, adjacency_file_name, distance_file_name):
 	distance_matrix = data_dictionary['distance_matrix']
 
 	file = open(distance_file_name, "w+")
-
-	for source in distance_matrix:
-		for destination in source:
-			file.write("%d " % destination)
-		file.write("\n")
+	for i,source in enumerate(distance_matrix):
+		for j,destination in enumerate(source):
+			if j != len(distance_matrix) -1:
+				file.write("%d " % destination)
+		if i != len(distance_matrix) - 1:
+			file.write("\n")
 	file.close()
 
 	file = open(adjacency_file_name, "w+")
-
 	for i in range(numpy_adjacency_matrix.shape[0]):
 		for j in range(numpy_adjacency_matrix.shape[1]):
-			file.write("%d " % numpy_adjacency_matrix[i,j])
-		file.write("\n")
+			if j != numpy_adjacency_matrix.shape[1]-1:
+				file.write("%d " % numpy_adjacency_matrix.loc[i,j])
+		if i != numpy_adjacency_matrix.shape[0] - 1:
+			file.write("\n")
 	file.close()		
 
 if __name__ == '__main__':
