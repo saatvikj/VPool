@@ -1,7 +1,7 @@
 from gurobipy import *
 import networkx as nx
 
-def give_model_approximate(graph)
+def give_model_approximate(graph):
 	matrix_dimension = graph.number_of_nodes()
 	model = Model("approximate")
 	all_vertex_color_exprs = []
@@ -15,7 +15,7 @@ def give_model_approximate(graph)
 		model.addConstr(vertex_color_expr,GRB.EQUAL,1)
 
 	for i in range(matrix_dimension):
-		for j in range(matrix_dimension+1,i,-1):
+		for j in range(matrix_dimension-1,i,-1):
 			model.addConstr(y[j,i],GRB.LESS_EQUAL,y[i,i])
 	
 	for i in graph.edges():
@@ -34,3 +34,4 @@ def give_model_approximate(graph)
 	return model.getObjective().getValue()
 
 if __name__ == '__main__':
+	pass

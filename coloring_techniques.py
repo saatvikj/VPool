@@ -3,7 +3,7 @@ import sys
 import operator
 
 def weight_sorted_sequential(graph, vertex_order):
-"""
+	"""
 	A sequential vertex coloring algorithm in which each vertex
 	in vertex ordering is given lowest indexed color it can get.
 	
@@ -20,7 +20,7 @@ def weight_sorted_sequential(graph, vertex_order):
 		on the sequential coloring greedy algorithm, dictionary maps
 		color index to list of vertices with that color.
 
-"""
+	"""
 	assigned_colors = {}
 	last_new_assigned_color = -1
 
@@ -40,7 +40,7 @@ def weight_sorted_sequential(graph, vertex_order):
 	return assigned_colors		
 
 def dsatur_coloring(graph):
-"""
+	"""
 	Direct DSATUR coloring of given input graph. Uses the networkx
 	implementation of DSATUR algorithm to give a vertex coloring.
 
@@ -54,7 +54,7 @@ def dsatur_coloring(graph):
 		off the DSATUR coloring, dictionary maps color index to
 		list of vertices with that color.
 
-"""
+	"""
 	
 	colors = nx.coloring.greedy_color(graph,strategy='DSATUR')
 	color_classes = {}
@@ -65,7 +65,7 @@ def dsatur_coloring(graph):
 
 
 def dsatur_based_weighted_coloring(graph, weight, vertex_order, greedy_allotment=False):
-"""
+	"""
 	Implementation of DSATUR coloring with change in comparison
 	function while selecting next vertex to color from saturation 
 	degree to saturation degree multiplied with some weight. 
@@ -94,26 +94,28 @@ def dsatur_based_weighted_coloring(graph, weight, vertex_order, greedy_allotment
 		off the DSATUR based coloring, dictionary maps color index to
 		list of vertices with that color.
 
-"""
+	"""
 
 	assigned_colors = {}
 	color_class_weights = {}
 	saturation_degree = {}
+	colored = {}
 	last_new_assigned_color = -1
 
 
 	#Initialize saturation degree of each vertex
 	for vertex in vertex_order:
 		saturation_degree[vertex] = 0
+		colored[vertex] = False
 
 	#Iterate till each vertex isn't colored
-	while len(vertex_order) != 0:
+	while len(vertex_order) > 0:
 
 		#Find vertex with maximum value of saturation degree*weight
-		max_value = -1
+		max_value = saturation_degree[vertex_order[0]]*weight[vertex_order[0]]
 		max_vertex = vertex_order[0]
 		for vertex in saturation_degree:
-			if saturation_degree[vertex]*weight[vertex] > max_value:
+			if saturation_degree[vertex]*weight[vertex] > max_value and colored[vertex] is not True:
 				max_value = saturation_degree[vertex]*weight[vertex]
 				max_vertex = vertex
 
@@ -151,31 +153,33 @@ def dsatur_based_weighted_coloring(graph, weight, vertex_order, greedy_allotment
 
 
 		if greedy_allotment:
-			differences = {}
-			selected_candidate = -1
-			larger_weight_available = False
-			for candidate in greedy_allotted_class_candidates:
-				differences[candidate] = color_class_weights[candidate]-nx.get_node_attributes(graph, 'weight')[max_vertex]
-				if differences[candidate] >= 0:
-					larger_weight_available = True
+			if len(greedy_allotted_class_candidates) != 0:
+				differences = {}
+				selected_candidate = -1
+				larger_weight_available = False
+				for candidate in greedy_allotted_class_candidates:
+					differences[candidate] = color_class_weights[candidate]-nx.get_node_attributes(graph, 'weight')[max_vertex]
+					if differences[candidate] >= 0:
+						larger_weight_available = True
 
-			if larger_weight_available:
-				lowest_difference = sys.maxint
-				for candidate in differences:
-					if differences[candidate] >= 0 and differences[candidate] <= lowest_difference:
-						lowest_difference = differences[candidate]
-						selected_candidate = candidate
+				if larger_weight_available:
+					lowest_difference = sys.maxsize
+					for candidate in differences:
+						if differences[candidate] >= 0 and differences[candidate] <= lowest_difference:
+							lowest_difference = differences[candidate]
+							selected_candidate = candidate
+				else:
+					selected_candidate = max(differences.iteritems(), key=operator.itemgetter(1))[0] 
 
-			else:
-				selected_candidate = max(differences.iteritems(), key=operator.itemgetter(1))[0] 
-
-			assigned_colors[selected_candidate].append(max_vertex)
-			for neighbor in neighbors:
-				if list(set(graph[neighbor]) & set(assigned_colors[selected_candidate])) == [max_vertex]:
-					saturation_degree[neighbor] += 1	
+				assigned_colors[selected_candidate].append(max_vertex)
+				color_assigned = True
+				for neighbor in neighbors:
+					if list(set(graph[neighbor]) & set(assigned_colors[selected_candidate])) == [max_vertex]:
+						saturation_degree[neighbor] += 1	
 
 		#If max value vertex can not be put in existing color classes, make a new color class
 		#and update saturation degree of all neighbors of colored vertex.
+
 		if not color_assigned:
 			assigned_colors[last_new_assigned_color+1] = []
 			assigned_colors[last_new_assigned_color+1].append(max_vertex)
@@ -187,12 +191,13 @@ def dsatur_based_weighted_coloring(graph, weight, vertex_order, greedy_allotment
 
 		#Update non colored vertex list by removing the colored vertex
 		vertex_order.remove(max_vertex)
+		colored[max_vertex] = True
 
 	return assigned_colors
 
 
 def calculate_coloring_weight(graph, coloring):
-"""
+	"""
 	Given a vertex coloring, calculate the weight of that coloring
 	based on the vertex weights. 
 
@@ -207,12 +212,12 @@ def calculate_coloring_weight(graph, coloring):
 	Returns:
 		The weight of the vertex coloring.
 
-"""
+	"""
 
 	weights = nx.get_node_attributes(graph, 'weight')
 	coloring_weight = 0
 	for color in coloring:
-		max_value = -sys.maxint-1		
+		max_value = -sys.maxsize-1		
 		for vertex in coloring[color]:
 			if weights[vertex] >= max_value:
 				max_value = weights[vertex]
