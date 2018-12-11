@@ -3,3 +3,4 @@ gurobi.log
 *.pyc
 adjacency_matrix.txt
 distance_matrix.txt
+*.csv
