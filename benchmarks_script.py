@@ -5,6 +5,21 @@ import csv
 import random
 
 def run_test(nodes, density, weights, iterations):
+	"""
+	Function to create an arbitrary graph with given number
+	of nodes, edge density and given weight function and run
+	the weighted vertex coloring on it.
+
+	Args:
+		nodes: Number of nodes of the graph
+		density: Edge density (Between 0 and 1)
+		weights: Node weights
+		iterations: Number of iterations of wvc
+
+	Returns:
+		A list of statistics obtained for the run.
+
+	"""
 	test_graph = nx.complete_graph(nodes)
 	number_of_removed_edges = int((1-density)*(len(test_graph.edges)))
 	removal = random.sample(list(test_graph.edges),number_of_removed_edges)
@@ -19,7 +34,7 @@ def run_test(nodes, density, weights, iterations):
 
 	results_list = [nodes, density, iterations, num_classes, avg_people_per_class]
 
-	print(results_list)
+	return results_list
 
 
 

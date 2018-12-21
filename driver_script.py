@@ -2,12 +2,22 @@ import weighted_vertex_coloring as wvc
 import utilities as utils
 import infinite_vehicle_allocator as iva
 import networkx
-import color_splitter as cs
 import sys
 import coloring_techniques as ct
 from Vehicle import Vehicle, comparator
 
 def vehicles_manifest():
+	"""
+	Function to return list of available
+	vehicles as vehicle objects.
+	
+	Args:
+		None
+
+	Returns:
+		List of vehicle objects with given
+		specifications.
+	"""
 	vehicle_1 = Vehicle(1,4,525.0)
 	vehicle_2 = Vehicle(2,6,850.0)
 	vehicle_3 = Vehicle(3,12,1000.0)
@@ -26,6 +36,21 @@ def vehicles_manifest():
 
 
 def runner(filename):
+	"""
+	Main runner function that initializes the graph, 
+	assigns weights to vertices, applies all algorithms 
+	to it and obtains response.
+	
+	Args:
+		filename: The name of pickle file containing data
+
+	Returns:
+		Void
+
+	"""
+	#Cost slabs is a dictionary where keys are 2 tuples with first value representing
+	#start distance and second representing end distance and values are lists with first
+	#element as base charge and second as per km charge (in rs)
 
 	slab = {}
 	slab[(0,5)] = [50,0]
@@ -45,7 +70,6 @@ def runner(filename):
 	vehicles.sort(comparator)
 
 	for color in coloring:
-		# cost, allotment = cs.color_spiltter(coloring[color], vehicles)
 		cost, allotment = iva.allot_vehicles(coloring[color], vehicles)
 		total_operator_cost += cost
 

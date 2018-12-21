@@ -1,6 +1,15 @@
 import pickle
 
 def read_file(filename):
+	"""
+	Function to read pickle file and give its data
+
+	Args:
+		filename: Name of pickle file
+
+	Returns:
+		Data dictionary that was stored in .pkl format.
+	"""
 	file = filename
 	data = None
 	with (open(file, "rb")) as openfile:
