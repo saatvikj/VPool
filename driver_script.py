@@ -27,10 +27,10 @@ def vehicles_manifest():
 
 	vehicles_list = []
 	vehicles_list.append(vehicle_1)
-	# vehicles_list.append(vehicle_2)
-	# vehicles_list.append(vehicle_3)
-	# vehicles_list.append(vehicle_4)	
-	# vehicles_list.append(vehicle_5)
+	vehicles_list.append(vehicle_2)
+	vehicles_list.append(vehicle_3)
+	vehicles_list.append(vehicle_4)	
+	vehicles_list.append(vehicle_5)
 
 	return vehicles_list
 
@@ -57,10 +57,15 @@ def runner(filename):
 	slab[(5,10)] = [70,0]
 	slab[(10,sys.maxsize)] = [70,2]
 
-	# utils.unpickle_to_file(filename, 'adjacency_matrix.txt', 'distance_matrix.txt')
-	distance_from_destination = utils.csv_to_file(filename, 'adjacency_matrix.txt')
+	option = int(sys.argv[1])
+	distance_from_destination = []
+	if option == 1:
+		utils.unpickle_to_file(filename, 'adjacency_matrix.txt', 'distance_matrix.txt')
+		distance_from_destination = wvc.get_distance_to_travel('distance_matrix.txt')
+	else:
+		distance_from_destination = utils.csv_to_file(filename, 'adjacency_matrix.txt')
+	
 	graph = wvc.create_graph_from_input('adjacency_matrix.txt')
-	# distance_from_destination = wvc.get_distance_to_travel('distance_matrix.txt')
 	rates = wvc.create_rates_for_slabs(distance_from_destination, slab)
 	graph = wvc.add_weight_to_vertices(graph, rates)
 	weight, coloring = wvc.give_best_coloring(graph, 10)
@@ -87,4 +92,4 @@ def runner(filename):
 	print("Revenue for DSATUR: %d" %standard_revenue)
 
 if __name__ == '__main__':
-	runner('nyc_taxi_data_2014.csv')
+	runner(sys.argv[2])

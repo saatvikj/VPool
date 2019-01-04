@@ -24,9 +24,9 @@ networkx
 
 ## Running the code
 
-In order to run the code, first obtain either a pickled format or csv format of the dataset you are going to run it on and then type the command:
+In order to run the code, first obtain either a pickled format or csv format of the dataset you are going to run it on, and then type the command:
 ```
-python driver_script.py -option
+python driver_script.py option filepath
 ```
-Where option is 1 for pickle file and 2 for csv file.
+Where option is 1 for pickle file and 2 for csv file and filepath is full path of the data file (no spaces)
 It is to be noted that csv file should be in NYC Taxi Data format only.
