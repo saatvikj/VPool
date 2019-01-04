@@ -6,6 +6,7 @@ import random
 import coloring_techniques as ct
 import minimum_approximate as ma
 
+
 def create_graph_from_input(filename):
 	"""
 	Creates the networkx graph to be used for coloring from input file.
@@ -28,7 +29,6 @@ def create_graph_from_input(filename):
 		coloring of the complement graph will give us the trips 
 		which can be shared together in one color class. 
 	"""
-
 	adj_matrix = []
 	input_rows = open(filename).read().split('\n')
 
@@ -50,15 +50,15 @@ def create_graph_from_input(filename):
 	return data
 
 
-
-def create_rates_for_slabs(filename, slab):
+def create_rates_for_slabs(distances, slab):
 	"""
 	Create rate matrix according to given slabs
 	by reading distance matrix from the input
 	file.
 
 	Args:
-		filename: File containing distance matrix.
+		distances: The distance list corresponding
+		to distance of each node from destination.
 
 		slab: A dictionary with all but last keys
 		as starting distance of slab and value as
@@ -68,9 +68,7 @@ def create_rates_for_slabs(filename, slab):
 
 	Returns:
 		A list of rates for each node in the vertex.
-
 	"""
-	distances = get_distance_to_travel(filename)
 	rates = []
 	for distance in distances:
 		for base in slab:
@@ -78,6 +76,7 @@ def create_rates_for_slabs(filename, slab):
 				rates.append(slab[base][0] + int(distance)*slab[base][1])
 
 	return rates
+
 
 def add_weight_to_vertices(graph, rates):
 	"""
@@ -91,18 +90,15 @@ def add_weight_to_vertices(graph, rates):
 		rates: the rate slab for a passenger in the
 		network.
 
-
 	Returns:
 		A networkx weighted graph with appropriate
 		weights assigned to the vertices according
 		to the weighing property.
 
-
 	Side note: Current weighing property is that
 		w(v) = w(v) - alpha(v) where alpha(v) is
 		a value which is decided by degree of the 
 		vertex v.
-
 	"""
 	nx.set_node_attributes(graph,0,'weight')
 	weights = nx.get_node_attributes(graph, 'weight')
@@ -110,7 +106,6 @@ def add_weight_to_vertices(graph, rates):
 		weights[node] = rate
 	nx.set_node_attributes(graph, weights, 'weight')
 	return graph
-
 
 
 def get_distance_to_travel(filename):
@@ -124,9 +119,7 @@ def get_distance_to_travel(filename):
 	Returns:
 		List of distances each person has to travel
 		to reach the destination.
-
 	"""
-	
 	distance_matrix = []
 	rows = open(filename).read().split('\n');
 	for row in rows:
@@ -135,6 +128,7 @@ def get_distance_to_travel(filename):
 	number_of_people = len(distance_matrix)
 
 	return distance_matrix[number_of_people-1]
+
 
 def get_sorted_nodes(graph):
 	"""
@@ -147,7 +141,6 @@ def get_sorted_nodes(graph):
 	Returns:
 		A list in which the nodes of the graph are
 		sorted in decreasing order of their weights.
-
 	"""
 	weights = nx.get_node_attributes(graph, 'weight')
 	weight_sorted_tuple_list = sorted(weights.items(), key=lambda item: item[1], reverse=True)
@@ -158,7 +151,6 @@ def get_sorted_nodes(graph):
 		sorted_nodes.append(i[0])
 
 	return sorted_nodes
-
 
 
 def get_weight_dictionaries(graph, choice):
@@ -182,9 +174,7 @@ def get_weight_dictionaries(graph, choice):
 		A dictionary representing the weights to be needed for
 		sending into the DSATUR variant function of coloring_techniques
 		module. Dictionary maps vertex to corresponding weight.
-
 	"""
-	
 	weight_dictionary = {}
 
 	for i in range(graph.number_of_nodes()):
@@ -218,9 +208,7 @@ def give_best_coloring(graph, iterations):
 		good heuristic for the weighted coloring problem,
 		dictionary maps color index to list of vertices having that
 		color.	
-
 	"""
-
 	# lower_bound = ma.give_model_approximate(graph)
 	nearest_coloring = ct.dsatur_coloring(graph) 
 	upper_bound = ct.calculate_coloring_weight(graph, nearest_coloring)

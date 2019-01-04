@@ -17,8 +17,9 @@ Python libraries required for running the code:
 numpy
 pandas
 gurobipy
-googlemaps
+osrm
 datetime
+networkx
 ```
 
 ## Running the code

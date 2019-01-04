@@ -2,6 +2,7 @@ import networkx as nx
 import sys
 import operator
 
+
 def weight_sorted_sequential(graph, vertex_order):
 	"""
 	A sequential vertex coloring algorithm in which each vertex
@@ -39,6 +40,7 @@ def weight_sorted_sequential(graph, vertex_order):
 
 	return assigned_colors		
 
+
 def dsatur_coloring(graph):
 	"""
 	Direct DSATUR coloring of given input graph. Uses the networkx
@@ -53,9 +55,7 @@ def dsatur_coloring(graph):
 		A dictionary containing the color classes of the graph based
 		off the DSATUR coloring, dictionary maps color index to
 		list of vertices with that color.
-
-	"""
-	
+	"""	
 	colors = nx.coloring.greedy_color(graph,strategy='DSATUR')
 	color_classes = {}
 	for k,v in colors.iteritems():
@@ -93,9 +93,7 @@ def dsatur_based_weighted_coloring(graph, weight, vertex_order, greedy_allotment
 		A dictionary containing the color classes of the graph based
 		off the DSATUR based coloring, dictionary maps color index to
 		list of vertices with that color.
-
 	"""
-
 	assigned_colors = {}
 	color_class_weights = {}
 	saturation_degree = {}
@@ -211,9 +209,7 @@ def calculate_coloring_weight(graph, coloring):
 
 	Returns:
 		The weight of the vertex coloring.
-
 	"""
-
 	weights = nx.get_node_attributes(graph, 'weight')
 	coloring_weight = 0
 	for color in coloring:
@@ -224,8 +220,6 @@ def calculate_coloring_weight(graph, coloring):
 		coloring_weight += max_value 
 
 	return coloring_weight
-
-
 
 if __name__ == '__main__':
 	pass

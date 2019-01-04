@@ -1,6 +1,7 @@
 from gurobipy import *
 import networkx as nx
 
+
 def give_model_approximate(graph):
 	"""
 	Function that implements ILP Model M2 as presented by 

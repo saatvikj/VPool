@@ -6,7 +6,8 @@ class Request(object):
 
         self.source_lat = source_lat
         self.source_long = source_long
-        self.dest_lat = dest_long
+        self.dest_lat = dest_lat
+        self.dest_long = dest_long
         self.pickup_datetime = pickup_datetime
         self.capacity = capacity
 

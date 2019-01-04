@@ -4,3 +4,5 @@ gurobi.log
 adjacency_matrix.txt
 distance_matrix.txt
 *.csv
+api_key.txt
+*.pkl

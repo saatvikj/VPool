@@ -1,5 +1,6 @@
 import pickle
 
+
 def read_file(filename):
 	"""
 	Function to read pickle file and give its data

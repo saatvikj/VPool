@@ -4,6 +4,7 @@ import weighted_vertex_coloring as wvc
 import csv
 import random
 
+
 def run_test(nodes, density, weights, iterations):
 	"""
 	Function to create an arbitrary graph with given number
@@ -18,7 +19,6 @@ def run_test(nodes, density, weights, iterations):
 
 	Returns:
 		A list of statistics obtained for the run.
-
 	"""
 	test_graph = nx.complete_graph(nodes)
 	number_of_removed_edges = int((1-density)*(len(test_graph.edges)))
@@ -35,9 +35,6 @@ def run_test(nodes, density, weights, iterations):
 	results_list = [nodes, density, iterations, num_classes, avg_people_per_class]
 
 	return results_list
-
-
-
 
 if __name__ == '__main__':
 

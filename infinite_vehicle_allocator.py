@@ -3,6 +3,7 @@ import sys
 import math
 from Vehicle import comparator
 
+
 def allot_vehicles(coloring, vehicles):
 	"""
 	Function to first get minimum cost through solving
@@ -63,7 +64,6 @@ def allot_vehicles(coloring, vehicles):
 			else:
 				i += 1
 	return minimum_cost, allotment
-
 
 
 def knapsack_with_atleast(index, value, table, n, lower_bound, vehicles):

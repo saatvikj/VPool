@@ -6,6 +6,7 @@ import sys
 import coloring_techniques as ct
 from Vehicle import Vehicle, comparator
 
+
 def vehicles_manifest():
 	"""
 	Function to return list of available
@@ -26,13 +27,12 @@ def vehicles_manifest():
 
 	vehicles_list = []
 	vehicles_list.append(vehicle_1)
-	vehicles_list.append(vehicle_2)
-	vehicles_list.append(vehicle_3)
-	vehicles_list.append(vehicle_4)	
-	vehicles_list.append(vehicle_5)
+	# vehicles_list.append(vehicle_2)
+	# vehicles_list.append(vehicle_3)
+	# vehicles_list.append(vehicle_4)	
+	# vehicles_list.append(vehicle_5)
 
 	return vehicles_list
-
 
 
 def runner(filename):
@@ -42,7 +42,7 @@ def runner(filename):
 	to it and obtains response.
 	
 	Args:
-		filename: The name of pickle file containing data
+		filename: The name of file containing data
 
 	Returns:
 		Void
@@ -57,12 +57,13 @@ def runner(filename):
 	slab[(5,10)] = [70,0]
 	slab[(10,sys.maxsize)] = [70,2]
 
-	utils.unpickle_to_file(filename, 'adjacency_matrix.txt', 'distance_matrix.txt')
+	# utils.unpickle_to_file(filename, 'adjacency_matrix.txt', 'distance_matrix.txt')
+	distance_from_destination = utils.csv_to_file(filename, 'adjacency_matrix.txt')
 	graph = wvc.create_graph_from_input('adjacency_matrix.txt')
-	distance_from_destination = wvc.get_distance_to_travel('distance_matrix.txt')
-	rates = wvc.create_rates_for_slabs('distance_matrix.txt', slab)
+	# distance_from_destination = wvc.get_distance_to_travel('distance_matrix.txt')
+	rates = wvc.create_rates_for_slabs(distance_from_destination, slab)
 	graph = wvc.add_weight_to_vertices(graph, rates)
-	weight, coloring = wvc.give_best_coloring(graph, 50)
+	weight, coloring = wvc.give_best_coloring(graph, 10)
 	print(weight)
 	
 	total_operator_cost = 0
@@ -79,11 +80,11 @@ def runner(filename):
 	standard_operator_cost = 0
 	standard_coloring = ct.dsatur_coloring(graph)
 	for color in standard_coloring:
-		standard_cost, standard_allotment = cs.color_spiltter(standard_coloring[color], vehicles)
+		standard_cost, standard_allotment = iva.allot_vehicles(standard_coloring[color], vehicles)
 		standard_operator_cost += cost
 
 	standard_revenue = sum(rates)-standard_operator_cost
 	print("Revenue for DSATUR: %d" %standard_revenue)
 
 if __name__ == '__main__':
-	runner('saatvik_data_len_129_152540.pkl')
+	runner('nyc_taxi_data_2014.csv')
