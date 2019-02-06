@@ -1,7 +1,8 @@
 import copy
 import sys
+sys.path.insert(0, 'D:/College/VPool/')
 import math
-from Vehicle import comparator
+from models.Vehicle import comparator
 
 
 def allot_vehicles(coloring, vehicles):

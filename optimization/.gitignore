@@ -1,0 +1,6 @@
+gurobi.log
+/__pycache__
+*.pyc
+*.csv
+*.pkl
+*.html

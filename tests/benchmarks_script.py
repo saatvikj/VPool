@@ -1,9 +1,10 @@
 from __future__ import division
+import sys
+sys.path.insert(0, 'D:/College/VPool/')
 import networkx as nx
-import weighted_vertex_coloring as wvc
 import csv
 import random
-
+from graph import weighted_vertex_coloring as wvc
 
 def run_test(nodes, density, weights, iterations):
 	"""

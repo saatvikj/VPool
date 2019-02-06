@@ -1,7 +1,7 @@
+from __future__ import division
 import networkx as nx 
 import sys
 import operator
-
 
 def weight_sorted_sequential(graph, vertex_order):
 	"""
@@ -167,7 +167,7 @@ def dsatur_based_weighted_coloring(graph, weight, vertex_order, greedy_allotment
 							lowest_difference = differences[candidate]
 							selected_candidate = candidate
 				else:
-					selected_candidate = max(differences.iteritems(), key=operator.itemgetter(1))[0] 
+					selected_candidate = max(differences.iteritems(), key=operator.itemgetter(1))[0]
 
 				assigned_colors[selected_candidate].append(max_vertex)
 				color_assigned = True
@@ -220,6 +220,28 @@ def calculate_coloring_weight(graph, coloring):
 		coloring_weight += max_value 
 
 	return coloring_weight
+
+
+def seq_coloring(graph):
+	"""
+	Direct SEQ coloring of given input graph. Uses the networkx
+	implementation of SEQ algorithm to give a vertex coloring.
+
+	Args:
+		graph: The networkx graph to be colored.
+
+	Returns:
+		A dictionary containing the color classes of the graph based
+		off the DSATUR coloring, dictionary maps color index to
+		list of vertices with that color.
+	"""	
+	colors = nx.coloring.greedy_color(graph,strategy='largest_first')
+	color_classes = {}
+	for k,v in colors.iteritems():
+		keys = color_classes.setdefault(v,[])
+		keys.append(k)
+
+	return color_classes
 
 if __name__ == '__main__':
 	pass

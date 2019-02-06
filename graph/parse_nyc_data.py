@@ -1,14 +1,14 @@
 from __future__ import division
+import sys
+sys.path.insert(0, 'D:/College/VPool/')
 import pandas as pd
-import numpy
-import osrm
+import utilities.ride_utility as rUtils
 from datetime import datetime
-from Request import Request
-
+from models.Request import Request
 
 def create_osrm_table(requests):
 	"""
-	Function to create a numpy array containing
+	Function to create a 2D array containing
 	information about distance and travel time
 	between points.
 
@@ -16,22 +16,18 @@ def create_osrm_table(requests):
 		requests: A list of request objects
 	
 	Returns:
-		A numpy array containg all information.
+		A 2D array containg all information.
 	"""
-	data = []
-	for request in requests:
-		data.append([request.source_lat,request.source_long])
+	source_coord = [[i.source_lat,i.source_long] for i in requests]
+	destination_coord = [[i.dest_lat,i.dest_long] for i in requests]
 
-	for request in requests:
-		data.append([request.dest_lat, request.dest_long])
+	source_data = rUtils.time_between_points(source_coord)
+	destination_data = rUtils.time_between_points(destination_coord)
 
-	list_id = [i for i in range(2*len(requests))]
-	time_matrix, snapped_coords = osrm.table(data,ids_origin=list_id,output='dataframe')
-
-	return time_matrix
+	return source_data, destination_data
 
 
-def check_admissibility(i, j, delta_1, delta_2, data, n):
+def check_admissibility(i, j, delta_1, delta_2, source_data, destination_data):
 	"""
 	Function to check whether two requests are admissible or not
 	by putting in the given criterion (flexible). Admissibility
@@ -43,13 +39,13 @@ def check_admissibility(i, j, delta_1, delta_2, data, n):
 		j: Index of second request object
 		delta_1: First condition for sources
 		delta_2: Second condition for destination
-		data: The numpy array containing information about requests
-		n: Number of requests in total
+		source_data: The numpy array containing information about requests
+		destination_data: Number of requests in total
 
 	Returns:
 		True if the two requests are admissible, false otherwise. 
 	"""
-	if data[i,j] < delta_1 and data[n+i,n+j] < delta_2:
+	if source_data[i][j] < delta_1 and destination_data[i][j] < delta_2:
 		return True
 	else:
 		return False
@@ -89,8 +85,8 @@ def read_dataset(filepath):
 	ny_dataset = pd.read_csv(filepath)
 	ny_dataset['pickup_datetime'] = ny_dataset['pickup_datetime'].map(change_string_to_datetime)
 
-	time_start = change_string_to_datetime('2014-01-08 09:00:00')
-	time_end = change_string_to_datetime('2014-01-08 09:05:00')
+	time_start = change_string_to_datetime('2014-01-01 14:00:00')
+	time_end = change_string_to_datetime('2014-01-01 14:05:00')
 	start_condition = ny_dataset['pickup_datetime'] > time_start
 	end_condition = ny_dataset['pickup_datetime'] < time_end
 
@@ -116,10 +112,10 @@ def create_request_objects(data):
 		request = Request(row['pickup_latitude'],row['pickup_longitude'],row['dropoff_latitude'],row['dropoff_longitude'],row['pickup_datetime'],row['passenger_count'])
 		requests.append(request)
 
-	return requests
+	return requests[:1000]
 
 
-def create_adjacency_matrix(requests, delta_1, delta_2, filename):
+def create_adjacency_matrix(requests, delta_1, delta_2):
 	"""
 	Function to create adjacency matrix from the
 	input data in accordance with given constraints
@@ -132,32 +128,26 @@ def create_adjacency_matrix(requests, delta_1, delta_2, filename):
 		in the system.
 		delta_1: First condition for sources.
 		delta_2: Second condition for destination.
-		filename: The file to which adjacency matrix
-		will be written.
-
+	
+	Returns:
+		A list having the adjacency matrix of the riders.
+		
 	It is to be noted that in adjacency matrix, 0 means
 	not admissible and 1 means admissible.
 	"""
-	admissibility_string = ""
-	data = create_osrm_table(requests)
+	adjacency_matrix = []
+	source_data, destination_data = create_osrm_table(requests)
 	for i,first_request in enumerate(requests):
+		data = []
 		for j,second_request in enumerate(requests):
-			admissibility = check_admissibility(first_request, second_request, delta_1, delta_2, data, len(requests))
-			if admissibility == True and j != len(requests)-1:
-				admissibility_string = admissibility_string + "1 "
-			elif admissibility == True:
-				admissibility_string = admissibility_string + "1"
-			elif admissibility == False and j != len(requests)-1:
-				admissibility_string = admissibility_string + "0 "
-			else:
-				admissibility_string = admissibility_string + "0"
+			admissibility = check_admissibility(i, j, delta_1, delta_2, source_data, destination_data)
+			if admissibility == True:
+				data.append(1)
+			elif admissibility == False:
+				data.append(0)
+		adjacency_matrix.append(data)
 
-		if i != len(requests)-1:
-			admissibility_string = admissibility_string + "\n"
-
-	file = open(filename, "w+")
-	file.writelines(admissibility_string)
-	file.close()
+	return adjacency_matrix
 
 
 def create_distance_matrix(requests):
@@ -175,9 +165,8 @@ def create_distance_matrix(requests):
 
 	distances = []
 	for request in requests:
-		result = osrm.simple_route([request.source_lat, request.source_long], [request.dest_lat, request.dest_long],output='route', overview="full", geometry='wkt')
-		distances.append(result['distance'])
-
+		distance = rUtils.get_distance_between_points([request.source_lat, request.source_long], [request.dest_lat, request.dest_long])
+		distances.append(distance)
 	return distances
 
 if __name__ == '__main__':

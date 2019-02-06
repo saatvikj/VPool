@@ -12,4 +12,4 @@ class Request(object):
         self.capacity = capacity
 
     def __str__(self):
-        pass
+        print([self.source_lat, self.source_long, self.dest_lat, self.dest_long])
