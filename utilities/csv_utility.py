@@ -20,7 +20,7 @@ def csv_to_data(csv_file_name):
 	"""
 	data = nyc.read_dataset('nyc_taxi_data_2014.csv')
 	requests = nyc.create_request_objects(data)
-	adjacency_matrix = nyc.create_adjacency_matrix(requests, 7.5, 7.5)
+	adjacency_matrix = nyc.create_adjacency_matrix(requests, 600, 600)
 
 	return adjacency_matrix, nyc.create_distance_matrix(requests)
 

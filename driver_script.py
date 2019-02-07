@@ -73,6 +73,9 @@ def runner(filename):
 	else:
 		adjacency_matrix, distance_from_destination = cUtils.csv_to_data(filename)
 
+	if len(sys.argv > 2):
+		pUtils.pickle_data(adjacency_matrix, distance_from_destination, sys.argv[3])
+
 	graph = init.create_graph_from_input(adjacency_matrix)
 	rates = rUtils.create_rates_for_slabs(distance_from_destination, slab)
 	graph = init.add_weight_to_vertices(graph, rates)

@@ -112,7 +112,7 @@ def create_request_objects(data):
 		request = Request(row['pickup_latitude'],row['pickup_longitude'],row['dropoff_latitude'],row['dropoff_longitude'],row['pickup_datetime'],row['passenger_count'])
 		requests.append(request)
 
-	return requests[:1000]
+	return requests[:250]
 
 
 def create_adjacency_matrix(requests, delta_1, delta_2):

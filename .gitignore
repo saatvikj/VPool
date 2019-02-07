@@ -1,9 +1,6 @@
 gurobi.log
 /__pycache__
 *.pyc
-adjacency_matrix.txt
-distance_matrix.txt
 *.csv
-api_key.txt
 *.pkl
 *.html
