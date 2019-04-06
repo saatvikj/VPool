@@ -5,6 +5,7 @@ import networkx as nx
 import math
 import random
 import copy
+import numpy as np
 import optimization.minimum_approximate as ma
 import coloring_techniques as ct
 
@@ -69,7 +70,6 @@ def give_best_coloring(graph, iterations):
 	nearest_coloring = ct.dsatur_coloring(graph) 
 	upper_bound = ct.calculate_coloring_weight(graph, nearest_coloring)
 	iteration = 0
-
 	nodes_list = get_sorted_nodes(graph)
 	while (iteration < iterations):
 
@@ -97,7 +97,7 @@ def give_best_coloring(graph, iterations):
 
 		iteration += 1
 
-		random.shuffle(nodes_list)
+		nodes_list = reorder_nodes(nearest_coloring)
 
 	return upper_bound, nearest_coloring
 
@@ -123,6 +123,32 @@ def get_sorted_nodes(graph):
 		sorted_nodes.append(i[0])
 
 	return sorted_nodes
+
+
+def reorder_nodes(color_classes):
+	"""
+	Using a reordering heuristic to order the
+	nodes for next iteration on the basis of
+	different heuristics.
+
+	Args:
+		color_classes: The obtained color class
+		from previous iteration.
+
+	Returns:
+		An ordering of the vertices for next
+		iteration.
+	"""
+	size_array = [color for color in color_classes]
+	numpy_size_array = np.array([len(color_classes[color]) for color in size_array])
+	sorted_index = np.argsort(numpy_size_array).tolist()
+
+	nodes_list = []
+
+	for index in sorted_index:
+		nodes_list.extend(color_classes[size_array[index]])
+
+	return nodes_list
 
 
 if __name__ == '__main__':

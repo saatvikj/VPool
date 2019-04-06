@@ -5,7 +5,7 @@ from graph import parse_nyc_data as nyc
 import pandas as pd
 
 
-def csv_to_data(csv_file_name):
+def csv_to_data(csv_file_name, time_start, time_end, port):
 	"""
 	Utility function to read content present in csv
 	file written in NYC data format and put into 
@@ -14,15 +14,20 @@ def csv_to_data(csv_file_name):
 	Args:
 		csv_file_name: Path of csv file containing
 		data
+		time_start: Start time for subset of dataset
+		time_end: End time for subset of dataset
+		port: The port running osrm.
 
 	Returns:
-		Adjacency matrix and distance matrix.
+		Adjacency matrix, distance from destinations,
+		distance between sources, distance between
+		destinations, distance between source destination
+		pairs.
 	"""
-	data = nyc.read_dataset('nyc_taxi_data_2014.csv')
+	data = nyc.read_dataset(csv_file_name, time_start, time_end)
 	requests = nyc.create_request_objects(data)
-	adjacency_matrix = nyc.create_adjacency_matrix(requests, 600, 600)
-
-	return adjacency_matrix, nyc.create_distance_matrix(requests)
+	adjacency_matrix, source_data, destination_data, source_destination_data = nyc.create_adjacency_matrix(requests, 600, 600, port)
+	return adjacency_matrix, nyc.create_distance_matrix(requests, port), source_data, destination_data, source_destination_data
 
 
 def graph_to_csv(pickle_file_name, csv_name):

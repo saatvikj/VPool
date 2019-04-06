@@ -24,11 +24,11 @@ networkx
 folium
 ```
 
-The code requires an instance of osrm running on your local system with the open street data of the area you are looking to run it on. A good starters guide to setting up and running an osrm instance on localhost is available at [this](https://reckoningrisk.com/coding/2017/OSRM-server/) link. If you instead want to use the demo server instead, follow the following steps-
+The code requires an instance of osrm running on your local system with the open street data of the area you are looking to run it on. A good starters guide to setting up and running an osrm instance on localhost is available at [this](https://reckoningrisk.com/coding/2017/OSRM-server/) link. If you instead want to use the demo server, follow the following steps-
 * Navigate to utilities > ride_utility.py
 * Change 127.0.0.1:5000 in request string everywhere to router.project-osrm.org
 
-However, since this is a public server, there is no assurances of it working for all requests due to limit exhaustion, server load etc.
+However, since this is a public server, there are no assurances of it working for all requests due to limit exhaustion, server load etc.
 ## Running the code
 
 In order to run the code, first obtain either a pickled format or csv format of the dataset you are going to run it on, and then type the command:

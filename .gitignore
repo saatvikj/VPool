@@ -4,3 +4,10 @@ gurobi.log
 *.csv
 *.pkl
 *.html
+/data
+/results
+iterate_dataset_5000.py
+iterate_dataset_6000.py
+iterate_dataset_7000.py
+iterate_dataset_8000.py
+iterate_dataset_9000.py

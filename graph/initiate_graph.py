@@ -1,11 +1,12 @@
 from __future__ import division
 import networkx as nx
 
+
 def create_graph_from_input(adj_matrix):
 	"""
 	Creates the networkx graph to be used for coloring from input.
 
-	Iterates over the contents of the file having admissibility
+	Iterates over the contents of the list having admissibility
 	matrix in order to create the corresponding networkx graph, 
 	adds information about vertex weight to each vertex
 	and changes input graph to graph whose coloring would fetch
@@ -17,11 +18,8 @@ def create_graph_from_input(adj_matrix):
 	Returns:
 		A networkx graph which is complement of graph corresponding
 		to graph given by admissibility matrix with each vertex 
-		containing extra information about the vertex weight. The
-		coloring of the complement graph will give us the trips 
-		which can be shared together in one color class. 
+		containing extra information about the vertex weight.
 	"""
-
 	data = nx.Graph()
 	for i in range(len(adj_matrix)):
 		data.add_node(i)
@@ -45,7 +43,6 @@ def add_weight_to_vertices(graph, rates):
 
 	Args:
 		graph: the networkx graph
-
 		rates: the rate slab for a passenger in the
 		network.
 
@@ -55,9 +52,9 @@ def add_weight_to_vertices(graph, rates):
 		to the weighing property.
 
 	Side note: Current weighing property is that
-		w(v) = w(v) - alpha(v) where alpha(v) is
-		a value which is decided by degree of the 
-		vertex v.
+		w(v) = d(v) where d(v) is the average 
+		distance between sources of other vertices
+		from v's source.
 	"""
 	nx.set_node_attributes(graph,0,'weight')
 	weights = nx.get_node_attributes(graph, 'weight')

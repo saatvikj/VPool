@@ -3,6 +3,7 @@ import networkx as nx
 import sys
 import operator
 
+
 def weight_sorted_sequential(graph, vertex_order):
 	"""
 	A sequential vertex coloring algorithm in which each vertex
@@ -10,7 +11,7 @@ def weight_sorted_sequential(graph, vertex_order):
 	
 	It is a greedy algorithm, in this application the order is 
 	set to decreasing order of weights and hence vertices with
-	similar weights are preferred to be given the same weight.
+	similar weights are preferred to be given the same color.
 
 	Args:
 		graph: The networkx graph to be colored.
@@ -20,7 +21,6 @@ def weight_sorted_sequential(graph, vertex_order):
 		A dictionary containing the color classes of the graph based
 		on the sequential coloring greedy algorithm, dictionary maps
 		color index to list of vertices with that color.
-
 	"""
 	assigned_colors = {}
 	last_new_assigned_color = -1
@@ -242,6 +242,7 @@ def seq_coloring(graph):
 		keys.append(k)
 
 	return color_classes
+
 
 if __name__ == '__main__':
 	pass

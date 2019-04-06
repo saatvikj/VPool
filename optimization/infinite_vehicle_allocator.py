@@ -35,8 +35,7 @@ def allot_vehicles(coloring, vehicles):
 			vehicle_list.append(vehicle)
 
 	total_required_vehicles=len(vehicle_list)
-	table=[[-1 for u in range(int(vehicle_list[0].cost*number_people))] for y in range(total_required_vehicles)]
-
+	table=[[-1 for u in range(10**5)] for y in range(total_required_vehicles)]
 	minimum_cost=knapsack_with_atleast(0,0,table,total_required_vehicles,number_people,vehicle_list)
 
 	i = 0
@@ -105,6 +104,7 @@ def knapsack_with_atleast(index, value, table, n, lower_bound, vehicles):
 	table[index][value] = choice
 
 	return table[index][value]
+
 
 if __name__ == '__main__':
 	pass

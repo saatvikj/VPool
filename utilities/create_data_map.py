@@ -26,15 +26,17 @@ def create_map(requests):
 	data_map = folium.Map(location=[lat,longd],zoom_start=10)
 	feature_group = folium.FeatureGroup("Locations")
 
-	for request in requests:
-		feature_group.add_child(folium.Marker(location=[request.source_lat,request.source_long]))
-		feature_group.add_child(folium.Marker(location=[request.dest_lat,request.dest_long],icon=folium.Icon(color='red')))
+	requests = [requests[19], requests[50], requests[86], requests[14]]
+
+	for i,request in enumerate(requests):
+		feature_group.add_child(folium.Marker(location=[request.source_lat,request.source_long],popup=str(i)))
+		feature_group.add_child(folium.Marker(location=[request.dest_lat,request.dest_long],popup=str(i),icon=folium.Icon(color='red')))
 
 	data_map.add_child(feature_group)
 	data_map.save(outfile = "map.html")
 
 
 if __name__ == '__main__':
-	data = nyc.read_dataset('nyc_taxi_data_2014.csv')
+	data = nyc.read_dataset('nyc_taxi_data_2014.csv', time_start='2014-01-02 09:00:00', time_end='2014-01-02 09:05:00')
 	requests = nyc.create_request_objects(data)
-	create_map(requests[:500])
+	create_map(requests[:100])

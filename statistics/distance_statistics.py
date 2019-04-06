@@ -1,4 +1,4 @@
-def get_distance_from_allocation(allocation,distances):
+def get_distance_from_allocation(allocation, distances):
 	"""
 	Function to get total distance travelled
 	from the given allocation of vehicles.
@@ -27,7 +27,7 @@ def get_distance_from_allocation(allocation,distances):
 
 def users_stats_in_coloring(allocation, distances):
 	"""
-	Gives average distance between the sources of
+	Gives distance between the sources of
 	two users in the allocation.
 
 	Args:
@@ -38,13 +38,13 @@ def users_stats_in_coloring(allocation, distances):
 		Average distance between sources of users
 		in the allocation.
 	"""
-	average_distance = 0.0
-	for user_1 in allocation:
-		for user_2 in allocation:
-			average_distance += distances[user_1][user_2]
+	total_distance = 0
+	for i,user_1 in enumerate(allocation):
+		for j,user_2 in enumerate(allocation):
+			if j <= i:
+				total_distance += distances[user_1][user_2]
 
-	average_distance /= len(allocation)
-	return average_distance
+	return total_distance
 
 
 if __name__ == '__main__':
