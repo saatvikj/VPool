@@ -8,6 +8,7 @@ from optimization import infinite_vehicle_allocator as iva
 from optimization import naive_wvc_solution as naive
 from optimization import minimum_approximate as ma
 from graph import coloring_techniques as ct
+from graph import parse_nyc_data as nyc
 from statistics import distance_statistics as dStats
 from statistics import vehicle_statistics as vStats
 from statistics import three_user_allocation as three
@@ -58,7 +59,7 @@ def vehicles_manifest(four=525.0, six=850.0, twelve=1000.0, thirty_five=3000.0, 
 	return vehicles_list
 
 
-def runner(filename, option, output=None,time_start='2014-01-01 10:00:00', time_end='2014-01-01 10:05:00', port=5000):
+def runner(filename, option, output=None,time_start='2014-01-01 10:00:00', time_end='2014-01-01 10:05:00', port=5000, text_output='vechicle_statistics.txt'):
 	"""
 	Main runner function that initializes the graph, 
 	assigns weights to vertices, applies all algorithms 
@@ -87,9 +88,13 @@ def runner(filename, option, output=None,time_start='2014-01-01 10:00:00', time_
 	adjacency_matrix = []
 	distance_from_destination = []
 	distance_matrix = []
+	requests = []
 	if int(option) == 1:
 		adjacency_matrix, distance_matrix, source_data, destination_data, source_destination_data = pUtils.unpickle_data(filename)
 		distance_from_destination = distance_matrix
+		size, pickle_time_start, pickle_time_end = pUtils.get_details_from_name(filename)
+		data = nyc.read_dataset('nyc_taxi_data_2014.csv', time_start=pickle_time_start, time_end=pickle_time_end)
+		requests = nyc.create_request_objects(data, size)
 	else:
 		adjacency_matrix, distance_from_destination, source_data, destination_data, source_destination_data = cUtils.csv_to_data(filename, time_start, time_end, port)
 
@@ -109,17 +114,13 @@ def runner(filename, option, output=None,time_start='2014-01-01 10:00:00', time_
 		vehicle.cost = math.ceil(maximum_distance)*15
 
 	weight, coloring = wvc.give_best_coloring(graph, 50)
-	wvc_results = cStats.coloring_statistics(0, coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, copy.deepcopy(rates))
-
-	print("Revenue for WVC: %d" %wvc_results[0])
+	wvc_results = cStats.coloring_statistics(0, coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, copy.deepcopy(rates), requests, text_output)
 
 	standard_coloring = ct.dsatur_coloring(graph)
 	standard_weight = ct.calculate_coloring_weight(graph, standard_coloring)
-	standard_coloring_results = cStats.coloring_statistics(0, standard_coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, copy.deepcopy(rates))
+	standard_coloring_results = cStats.coloring_statistics(0, standard_coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, copy.deepcopy(rates), requests, text_output)
 
-	print("Revenue for DSATUR: %d" %standard_coloring_results[0])
-
-	return [graph.number_of_nodes(), wvc_results[0], standard_coloring_results[0] , wvc_results[1]-standard_coloring_results[1], wvc_results[2], standard_coloring_results[2], wvc_results[3], standard_coloring_results[3], wvc_results[4], standard_coloring_results[4], wvc_results[5], standard_coloring_results[5], wvc_results[6], standard_coloring_results[6]]
+	return [graph.number_of_nodes(), wvc_results[0], standard_coloring_results[0] , wvc_results[1]-standard_coloring_results[1], wvc_results[2], standard_coloring_results[2], wvc_results[3], standard_coloring_results[3], wvc_results[4], standard_coloring_results[4], wvc_results[5], standard_coloring_results[5], wvc_results[6], standard_coloring_results[6], wvc_results[7], standard_coloring_results[7]]
 
 
 if __name__ == '__main__':

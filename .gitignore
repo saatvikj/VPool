@@ -4,6 +4,7 @@ gurobi.log
 *.csv
 *.pkl
 *.html
+*.txt
 /data
 /results
 iterate_dataset_5000.py

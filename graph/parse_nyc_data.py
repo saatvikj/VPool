@@ -119,10 +119,10 @@ def read_dataset(filepath, time_start='2014-01-01 14:00:00', time_end='2014-01-0
 	end_condition = ny_dataset['pickup_datetime'] < time_end
 
 	subset = ny_dataset[start_condition & end_condition]
-	return ny_dataset
+	return subset
 
 
-def create_request_objects(data):
+def create_request_objects(data, size_limit=100):
 	"""
 	Function to create request objects
 	from the pandas dataframe containg
@@ -130,7 +130,9 @@ def create_request_objects(data):
 
 	Args:
 		data: The pandas dataframe
-
+		size_limit: The upper bound
+		on number of objects
+	
 	Returns:
 		A list of objects of request
 		type.
@@ -140,8 +142,8 @@ def create_request_objects(data):
 		request = Request(row['pickup_latitude'],row['pickup_longitude'],row['dropoff_latitude'],row['dropoff_longitude'],row['pickup_datetime'],row['passenger_count'])
 		requests.append(request)
 
-	if len(requests) > 100:
-		return requests[:100]
+	if len(requests) > size_limit:
+		return requests[:size_limit]
 	else:
 		return requests
 

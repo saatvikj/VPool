@@ -1,4 +1,5 @@
 import pickle
+import datetime
 import numpy
 
 
@@ -77,6 +78,33 @@ def pickle_data(adjacency_matrix, distance_matrix, source_data, destination_data
 	pickle.dump(pickle_dictionary, pickle_file)
 	pickle_file.close()
 
+
+def get_details_from_name(name):
+	"""
+	A function you make when you fuck
+	things up, takes name of pickle
+	file and returns parameters from
+	which the dataset was queried.
+
+	Args:
+		name: Name of pickle file.
+
+	Returns:
+		Size of request objects, query
+		start time, query end time.
+	
+	Thank god I used a good naming system.
+	"""
+	name_details = name.split('_')
+	date = int(name_details[3])
+	start_time_hour = int(name_details[4][:2])
+	start_time_minute = int(name_details[4][2:])
+	query_length = int(name_details[5].split('.')[0])
+
+	start_time = datetime.datetime(2014,1,date,start_time_hour, start_time_minute)
+	end_time = start_time + datetime.timedelta(minutes=5)
+	
+	return query_length, start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S')
 
 if __name__ == '__main__':
 	pass
