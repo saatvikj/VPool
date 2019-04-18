@@ -2,8 +2,28 @@ from __future__ import division
 import requests
 import json
 import polyline
+import osrm
+import urllib
 from urllib import quote
 
+
+def polyline_encoded_table(requests):
+
+	osrm.RequestConfig.host = "http://traffickarma.iiitd.edu.in:8091"	
+
+	sources_data = [(i.source_long, i.source_lat) for i in requests]
+	destinations_data = [(i.dest_long, i.dest_lat) for i in requests]
+
+	coordinates = []
+	for element in sources_data:
+		coordinates.append(element)
+
+	for element in destinations_data:
+		coordinates.append(element)
+
+	response = osrm.table(coordinates, output='raw', annotations='distance')
+
+	return response['distances']
 
 def get_distance_between_points(point_1, point_2, port):
 	"""

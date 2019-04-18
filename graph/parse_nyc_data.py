@@ -7,6 +7,23 @@ from datetime import datetime
 from models.Request import Request
 
 
+def osrm_table(requests):
+
+	n = len(requests)
+
+	results = rUtils.polyline_encoded_table(requests)
+
+	source_data = []
+	destination_data = []
+	source_destination_data = []
+
+	for i in range(n):
+		source_data.append(results[i][:n])
+		destination_data.append(results[n+i][n:])
+		source_destination_data.append(results[i][n:])
+
+	return source_data, destination_data, source_destination_data
+
 def create_osrm_table(requests, port):
 	"""
 	Function to create a 2D array containing
@@ -172,7 +189,8 @@ def create_adjacency_matrix(requests, delta_1, delta_2, port):
 	not admissible and 1 means admissible.
 	"""
 	adjacency_matrix = []
-	source_data, destination_data, source_destination_data = create_osrm_table(requests, port)
+	# source_data, destination_data, source_destination_data = create_osrm_table(requests, port)
+	source_data, destination_data, source_destination_data = osrm_table(requests)
 	for i,first_request in enumerate(requests):
 		data = []
 		for j,second_request in enumerate(requests):
@@ -186,7 +204,7 @@ def create_adjacency_matrix(requests, delta_1, delta_2, port):
 	return adjacency_matrix, source_data, destination_data, source_destination_data
 
 
-def create_distance_matrix(requests, port):
+def create_distance_matrix(source_destination_data):
 	"""
 	Function to create distance matrix depicting
 	distances between all pairs of requests.
@@ -200,9 +218,8 @@ def create_distance_matrix(requests, port):
 	"""
 
 	distances = []
-	for request in requests:
-		distance = rUtils.get_distance_between_points([request.source_lat, request.source_long], [request.dest_lat, request.dest_long], port)
-		distances.append(distance)
+	for i in range(len(source_destination_data)):
+		distances.append(source_destination_data[i][i])
 	return distances
 
 

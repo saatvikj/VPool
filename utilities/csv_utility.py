@@ -27,7 +27,7 @@ def csv_to_data(csv_file_name, time_start, time_end, port):
 	data = nyc.read_dataset(csv_file_name, time_start, time_end)
 	requests = nyc.create_request_objects(data)
 	adjacency_matrix, source_data, destination_data, source_destination_data = nyc.create_adjacency_matrix(requests, 600, 600, port)
-	return adjacency_matrix, nyc.create_distance_matrix(requests, port), source_data, destination_data, source_destination_data
+	return adjacency_matrix, nyc.create_distance_matrix(source_destination_data), source_data, destination_data, source_destination_data, requests
 
 
 def graph_to_csv(pickle_file_name, csv_name):

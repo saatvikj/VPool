@@ -77,6 +77,9 @@ def coloring_statistics(option, coloring, vehicles, distance_from_destination, s
 			if len(vehicle.passengers) == 1:
 				rates[vehicle.passengers[0]] = maximum_vehicle_distance*20
 				single_user_vehicles += 1
+			elif vehicle.cap > 4:
+				for passenger in vehicle.passengers:
+					rates[passenger] = maximum_vehicle_distance*10
 
 			if option == 1:
 				if maximum_vehicle_distance <= 10:

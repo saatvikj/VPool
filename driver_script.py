@@ -59,7 +59,7 @@ def vehicles_manifest(four=525.0, six=850.0, twelve=1000.0, thirty_five=3000.0, 
 	return vehicles_list
 
 
-def runner(filename, option, output=None,time_start='2014-01-01 10:00:00', time_end='2014-01-01 10:05:00', port=5000, text_output='vechicle_statistics.txt'):
+def runner(filename, option, output=None,time_start='2014-01-01 09:00:00', time_end='2014-01-30 22:00:00', port=5000, text_output='vechicle_statistics.txt'):
 	"""
 	Main runner function that initializes the graph, 
 	assigns weights to vertices, applies all algorithms 
@@ -96,7 +96,7 @@ def runner(filename, option, output=None,time_start='2014-01-01 10:00:00', time_
 		data = nyc.read_dataset('nyc_taxi_data_2014.csv', time_start=pickle_time_start, time_end=pickle_time_end)
 		requests = nyc.create_request_objects(data, size)
 	else:
-		adjacency_matrix, distance_from_destination, source_data, destination_data, source_destination_data = cUtils.csv_to_data(filename, time_start, time_end, port)
+		adjacency_matrix, distance_from_destination, source_data, destination_data, source_destination_data, requests = cUtils.csv_to_data(filename, time_start, time_end, port)
 
 	if output is not None:
 		pUtils.pickle_data(adjacency_matrix, distance_from_destination, source_data, destination_data, source_destination_data, output)
@@ -108,10 +108,15 @@ def runner(filename, option, output=None,time_start='2014-01-01 10:00:00', time_
 	graph = init.add_weight_to_vertices(graph, average_distances)
 	
 	vehicles = vehicles_manifest()
-	vehicles.sort(comparator)
+	vehicles.sort(comparator, reverse=True)
 
 	for vehicle in vehicles:
-		vehicle.cost = math.ceil(maximum_distance)*15
+		if vehicle.cap == 4:
+			vehicle.cost = math.ceil(maximum_distance)*15
+		elif vehicle.cap == 6:
+			vehicle.cost = math.ceil(maximum_distance)*25
+		else:
+			vehicle.cost = math.ceil(maximum_distance)*30
 
 	weight, coloring = wvc.give_best_coloring(graph, 50)
 	wvc_results = cStats.coloring_statistics(0, coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, copy.deepcopy(rates), requests, text_output)
