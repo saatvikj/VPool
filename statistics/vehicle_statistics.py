@@ -4,14 +4,15 @@ import numpy as np
 
 def user_vs_vehicle_comparison(allotment, rates, vehicle_rate):
 	"""
-	Function to check number of users
-	paying more than vehicle cost for 
-	a vehicle.
+	Function to check number of users paying more 
+	than vehicle running cost for a vehicle.
 
 	Args:
-		allotment: The vehicle riders
+		allotment: The allotted riders of the vehicle
+
 		rates: Rates being charged to all riders
-		vehicle_rate: Cost of running vehicle
+
+		vehicle_rate: Cost of running the vehicle
 	
 	Returns:
 		Number of users paying more than cost
@@ -34,11 +35,18 @@ def two_user_route_statistics(i,j, source_data, destination_data, source_destina
 
 	Args:
 		i: The first user
+
 		j: The second user
-		source_data: Distance matrix between sources
-		destination_data: Distance matrix between destinations
-		source_destination_data: Distance matrix between source destinations 
-		delta: Admissiblity criteria for total distance travelled.
+		
+		source_data: Distance matrix of sources of riders
+
+		destination_data: Distance matrix of destinations
+		of riders
+
+		source_destination_data: Distance matrix of sources
+		and destinations of riders
+
+		delta: The tolerance value used for admissibility
 
 	Returns:
 		3 values, the occupancy index, distance for which all 3 users
@@ -95,3 +103,7 @@ def two_user_route_statistics(i,j, source_data, destination_data, source_destina
 
 
 	return occupancy_ratio, common_travel_distance, minimum_distance_so_far
+
+
+if __name__ == '__main__':
+	pass

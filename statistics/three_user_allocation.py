@@ -11,12 +11,20 @@ def three_user_route_statistics(i, j, k, source_data, destination_data, source_d
 
 	Args:
 		i: The first user
+
 		j: The second user
+
 		k: The third user
-		source_data: Distance matrix between sources
-		destination_data: Distance matrix between destinations
-		source_destination_data: Distance matrix between source destinations 
-		delta: Admissiblity criteria for total distance travelled.
+
+		source_data: Distance matrix of sources of riders
+
+		destination_data: Distance matrix of destinations
+		of riders
+
+		source_destination_data: Distance matrix of sources
+		and destinations of riders
+
+		delta: The tolerance value used for admissibility
 
 	Returns:
 		3 values, the occupancy index, distance for which all 3 users
@@ -565,3 +573,7 @@ def three_user_route_statistics(i, j, k, source_data, destination_data, source_d
 		common_travel_distance = 0.0
 
 	return occupancy_ratio, common_travel_distance, minimum_distance_so_far
+
+
+if __name__ == '__main__':
+	pass

@@ -1,3 +1,8 @@
+"""
+Code that iterates over all files in the given
+input folder, applies algorithms on it and stores
+all results in a single compiled input CSV file.
+"""
 import datetime
 import pandas as pd
 from driver_script import runner
@@ -8,15 +13,13 @@ import sys
 filenames = []
 for file in glob.glob(sys.argv[1]+"/*.pkl"):
 	filenames.append(file)
-
-filenames = filenames[:int(sys.argv[4])]
-
+	
 j = 0
 df = pd.DataFrame(columns=['Title','Size','DSATUR','WVC','Difference','DSATUR More Than Vehicle','WVC More Than Vehicle','DSATUR Vehicles','WVC Vehicles', 'DSATUR Ratio','WVC Ratio','DSATUR Single user vehicles','WVC Single user vehicles'])
 for i,name in enumerate(filenames):
 
 	try:
-		pickle_results = runner(name,1,text_output=sys.argv[3])
+		pickle_results = runner(filename=name, option=1, text_output=sys.argv[3])
 		print(j)
 		df.loc[j,'Title'] = name
 		df.loc[j,'Size'] = pickle_results[0]

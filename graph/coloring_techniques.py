@@ -14,8 +14,11 @@ def weight_sorted_sequential(graph, vertex_order):
 	similar weights are preferred to be given the same color.
 
 	Args:
-		graph: The networkx graph to be colored.
-		vertex_order: The order in which vertices are to be colored.
+		graph: The networkx graph on which the sequential coloring
+		algorithm is to be applied.
+
+		vertex_order: The order in which vertices are to be colored,
+		earlier defined to be decreasing order of weights.
 
 	Returns:
 		A dictionary containing the color classes of the graph based
@@ -49,7 +52,8 @@ def dsatur_coloring(graph):
 	DSATUR Coloring Algorithm: http://cs.indstate.edu/tdu/mine1.pdf
 
 	Args:
-		graph: The networkx graph to be colored.
+		graph: The networkx graph on which the DSATUR coloring
+		algoirithm is to be applied.
 
 	Returns:
 		A dictionary containing the color classes of the graph based
@@ -80,14 +84,19 @@ def dsatur_based_weighted_coloring(graph, weight, vertex_order, greedy_allotment
 		2) Else select the one which minimizes w(class)-w(vertex)
 		
 	Args:
-		graph: The networkx graph to be colored
+		graph: The networkx graph on which the DSATUR based coloring
+		algoirithm is to be applied.
+
 		weight: A dictionary representing the weight to be multiplied
 		with each vertex. Key is vertex id, value is weight.
+
 		vertex_order: The order in which vertices are put to handle any
 		conflicts, i.e if saturation degree*weight is same, vertex that
 		comes first in ordering is chosen.
-		greedy_allotment: Specifies whether allotment needs to be done
-		in standard way or by following greedy heuristics.
+
+		greedy_allotment (optional): Specifies whether allotment needs 
+		to be done in standard way or by following greedy heuristics
+		that were mentioned above.
 
 	Returns:
 		A dictionary containing the color classes of the graph based
@@ -203,7 +212,9 @@ def calculate_coloring_weight(graph, coloring):
 	weighted vertices for each color class.
 
 	Args:
-		graph: The networkx graph to be colored
+		graph: The networkx graph on which the coloring algoirithm 
+		has been applied.
+
 		coloring: A dictionary containing the color classes of the graph, 
 		dictionary maps color index to list of vertices with that color.
 
@@ -228,11 +239,12 @@ def seq_coloring(graph):
 	implementation of SEQ algorithm to give a vertex coloring.
 
 	Args:
-		graph: The networkx graph to be colored.
+		graph: The networkx graph on which the DSATUR coloring
+		algoirithm is to be applied.
 
 	Returns:
 		A dictionary containing the color classes of the graph based
-		off the DSATUR coloring, dictionary maps color index to
+		off the SEQ coloring, dictionary maps color index to
 		list of vertices with that color.
 	"""	
 	colors = nx.coloring.greedy_color(graph,strategy='largest_first')

@@ -1,7 +1,7 @@
 from __future__ import division
 import copy
 import sys
-sys.path.insert(0, 'D:/College/VPool/')
+sys.path.insert(0, 'D:/College/BTP/VPool/')
 import optimization.infinite_vehicle_allocator as iva
 import distance_statistics as dStats
 import vehicle_statistics as vStats
@@ -9,16 +9,42 @@ import route_statistics as rStats
 import os
 
 
-cost_slab = {
-   4: [350, 450, 500, 525],
-   6: [600, 700, 750, 850],
-   12: [650, 800, 850, 1000],
-   35: [2800, 2800, 2800, 3000],
-   41: [3000, 3000, 3000, 3200],
-}
+def coloring_statistics(coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, rates, requests, text_output):
+	"""
+	Function to calculate statistics related to the coloring
+	obtained, statistics range from vehicle to route
+	statistics and statistics about operator profits.
 
-def coloring_statistics(option, coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, rates, requests, text_output):
+	Args:
+		coloring: The obtained color class from graph coloring.
 
+		vehicles: The vehicles allocated to the given color
+		class.
+
+		distance_from_destination: Distance of each rider from
+		their destination.
+
+		source_data: Distance matrix of sources of riders
+
+		destination_data: Distance matrix of destinations
+		of riders
+
+		source_destination_data: Distance matrix of sources
+		and destinations of riders
+
+		rates: The list of rates charged to each rider for
+		being part of the system.
+
+		requests: A list of objects of the class request
+		corresponding to each rider in the system.
+
+		text_output: The output text file used to communicate
+		with jsprit java code.
+
+	Returns:
+		The statistics obtained of the given
+		coloring.
+	"""
 	total_operator_cost = 0
 	total_used_vehicles = 0
 	in_source_distances = 0
@@ -81,22 +107,14 @@ def coloring_statistics(option, coloring, vehicles, distance_from_destination, s
 				for passenger in vehicle.passengers:
 					rates[passenger] = maximum_vehicle_distance*10
 
-			if option == 1:
-				if maximum_vehicle_distance <= 10:
-					cost = cost + cost_slab[vehicle.cap][0] - vehicle.cost
-					cost_incurred = cost_slab[vehicle.cap][0]
-				elif maximum_vehicle_distance > 10 and maximum_vehicle_distance <= 20:
-					cost = cost + cost_slab[vehicle.cap][1] - vehicle.cost
-					cost_incurred = cost_slab[vehicle.cap][1]
-				elif maximum_vehicle_distance > 20 and maximum_vehicle_distance <= 30:
-					cost = cost + cost_slab[vehicle.cap][2] - vehicle.cost
-					cost_incurred = cost_slab[vehicle.cap][2]
-				else:
-					cost = cost
-					cost_incurred = vehicle.cost
-			else:
+			if vehicle.cap == 4:
 				cost_incurred = maximum_vehicle_distance*15
-				cost = cost + cost_incurred - vehicle.cost
+			elif vehicle.cap == 6:
+				cost_incurred = maximum_vehicle_distance*25
+			else:
+				cost_incurred = maximum_vehicle_distance*30
+
+			cost = cost + cost_incurred - vehicle.cost
 
 			in_source_distances += dStats.users_stats_in_coloring(vehicle.passengers, source_data)
 			users_above_slab += vStats.user_vs_vehicle_comparison(vehicle.passengers, rates, cost_incurred)
@@ -109,3 +127,7 @@ def coloring_statistics(option, coloring, vehicles, distance_from_destination, s
 	combined_distance = combined_distance/total_used_vehicles
 	vehicle_distance = vehicle_distance/total_used_vehicles
 	return [revenue, in_source_distances/total_used_vehicles, users_above_slab, total_used_vehicles, average_ratio, combined_distance/vehicle_distance, single_user_vehicles, vehicle_distance]
+
+
+	if __name__ == '__main__':
+		pass

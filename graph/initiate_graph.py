@@ -13,7 +13,8 @@ def create_graph_from_input(adj_matrix):
 	the sharability network.
 
 	Args:
-		adj_matrix: The adjacency matrix.
+		adj_matrix: The adjacency matrix of the graph created
+		from the input data.
 
 	Returns:
 		A networkx graph which is complement of graph corresponding
@@ -42,9 +43,11 @@ def add_weight_to_vertices(graph, rates):
 	vertices.
 
 	Args:
-		graph: the networkx graph
-		rates: the rate slab for a passenger in the
-		network.
+		graph: The networkx graph on which the weights
+		need to be added.
+
+		rates: The weights that correspond to each rider
+		in the network.
 
 	Returns:
 		A networkx weighted graph with appropriate
@@ -58,9 +61,11 @@ def add_weight_to_vertices(graph, rates):
 	"""
 	nx.set_node_attributes(graph,0,'weight')
 	weights = nx.get_node_attributes(graph, 'weight')
+
 	for node, rate in enumerate(rates):
 		weights[node] = rate
 	nx.set_node_attributes(graph, weights, 'weight')
+
 	return graph
 
 

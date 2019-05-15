@@ -1,6 +1,6 @@
 from __future__ import division
 import sys
-sys.path.insert(0, 'D:/College/VPool/')
+sys.path.insert(0, 'D:/College/BTP/VPool/')
 import folium
 import pandas as pd
 from graph import parse_nyc_data as nyc
@@ -15,8 +15,10 @@ def create_map(requests):
 	webpage for the same based on leaflet.js
 
 	Args:
-		requests: All request objects
-
+		requests: A list of objects of the class
+		Request corresponding to each rider in the
+		system.
+		
 	Returns:
 		Void
 	"""

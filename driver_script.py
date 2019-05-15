@@ -21,28 +21,26 @@ import copy
 import math
 
 
-cost_slab = {
-   4: [350, 450, 500, 525],
-   6: [600, 700, 750, 850],
-   12: [650, 800, 850, 1000],
-   35: [2800, 2800, 2800, 3000],
-   41: [3000, 3000, 3000, 3200],
-}
-
-
 def vehicles_manifest(four=525.0, six=850.0, twelve=1000.0, thirty_five=3000.0, forty_one= 3200.0):
 	"""
 	Function to return list of available
 	vehicles as vehicle objects.
 	
 	Args:
-		None
+		four (optional): The running cost of 4 seater vehicle.
+
+		six (optional): The running cost of 6 seater vehicle.
+
+		twelve (optional): The running cost of 12 seater vehicle.
+
+		thirty_five (optional): The running cost of 35 seater vehicle.
+
+		forty_one (optional): The running cost of 41 seater vehicle.
 
 	Returns:
 		List of vehicle objects with given
 		specifications.
 	"""
-	vehicle_0 = Vehicle(0,3,400.0)
 	vehicle_1 = Vehicle(1,4,four)
 	vehicle_2 = Vehicle(2,6,six)
 	vehicle_3 = Vehicle(3,12,twelve)
@@ -59,26 +57,51 @@ def vehicles_manifest(four=525.0, six=850.0, twelve=1000.0, thirty_five=3000.0, 
 	return vehicles_list
 
 
-def runner(filename, option, output=None,time_start='2014-01-01 09:00:00', time_end='2014-01-30 22:00:00', port=5000, text_output='vechicle_statistics.txt'):
+def runner(filename, option, text_output='vechicle_statistics.txt', output=None, time_start='2014-01-01 09:00:00', time_end='2014-01-30 22:00:00', port=5000, delta=1.2):
 	"""
 	Main runner function that initializes the graph, 
 	assigns weights to vertices, applies all algorithms 
-	to it and obtains response.
+	to it and obtains response for the given data.
 	
 	Args:
-		filename: The name of file containing data
-		option: 1 for pickled data, 2 for csv
-		output: Name of output pickle file (optional)
-		time_start: Start time for subset.
-		time_end: End time for subset.
-		port: The port running osrm.
+		filename: Full path of file containing data.
+
+		option: Parameter to specify the type of data,
+		1 for pickled data, 2 for csv data.
+
+		text_output: The output text file used to communicate
+		with jsprit java code (Default: vehicle_statistics.txt).
+
+		output (optional): Full path of where to save 
+		the graph and generated data for later, it is
+		only used if data needs to be saved for later.
+
+		time_start (optional): Start time to query the
+		input dataset for data, it is only needed for
+		querying the dataset when input type is CSV.
+
+		time_end (optional): End time to query the input
+		dataset for data, it is only needed for
+		querying the dataset when input type is CSV.
+
+		port (optional): The localhost port on which osrm 
+		server is running, it is only needed for generating
+		the distances between points after dataset is 
+		queried when input type is CSV.
+
+		delta (optional): The tolerance value used for
+		admissibility, it is only used to create the graph
+		when tolerance levels are required to decide 
+		admissibility when input type is CSV. 
 
 	Returns:
-		Void
+		A list of statistics corresponding to the algorithm
+		applied on input/queried data with both WVC and
+		standard coloring in the coloring phase.
 	"""
-	#Cost slabs is a dictionary where keys are 2 tuples with first value representing
+	#Slab is a dictionary where keys are 2 tuples with first value representing
 	#start distance and second representing end distance and values are lists with first
-	#element as base charge and second as per km charge (in rs)
+	#element as base charge and second as per km charge (in rs) for riders to travel.
 
 	slab = {}
 	slab[(0,5)] = [0,15]
@@ -90,16 +113,13 @@ def runner(filename, option, output=None,time_start='2014-01-01 09:00:00', time_
 	distance_matrix = []
 	requests = []
 	if int(option) == 1:
-		adjacency_matrix, distance_matrix, source_data, destination_data, source_destination_data = pUtils.unpickle_data(filename)
+		adjacency_matrix, distance_matrix, source_data, destination_data, source_destination_data, requests = pUtils.unpickle_data(filename)
 		distance_from_destination = distance_matrix
-		size, pickle_time_start, pickle_time_end = pUtils.get_details_from_name(filename)
-		data = nyc.read_dataset('nyc_taxi_data_2014.csv', time_start=pickle_time_start, time_end=pickle_time_end)
-		requests = nyc.create_request_objects(data, size)
 	else:
-		adjacency_matrix, distance_from_destination, source_data, destination_data, source_destination_data, requests = cUtils.csv_to_data(filename, time_start, time_end, port)
+		adjacency_matrix, distance_from_destination, source_data, destination_data, source_destination_data, requests = cUtils.csv_to_data(filename, time_start, time_end, port, delta)
 
 	if output is not None:
-		pUtils.pickle_data(adjacency_matrix, distance_from_destination, source_data, destination_data, source_destination_data, output)
+		pUtils.pickle_data(adjacency_matrix, distance_from_destination, source_data, destination_data, source_destination_data, requests, output)
 
 	maximum_distance = max(distance_from_destination)/1000.0
 	graph = init.create_graph_from_input(adjacency_matrix)

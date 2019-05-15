@@ -1,6 +1,6 @@
 from __future__ import division
 import sys
-sys.path.insert(0, 'D:/College/VPool/')
+sys.path.insert(0, 'D:/College/BTP/VPool/')
 import networkx as nx
 import math
 import random
@@ -18,8 +18,9 @@ def get_weight_dictionaries(graph, choice):
 
 	Args:
 		graph: The networkx weighted vertex graph in question
+
 		choice: Integer representing for which variation we want 
-		the weight dictionary., will be one of the values between
+		the weight dictionary, will be one of the values between
 		0 and 4 (inclusive).
 			0: Weight = 1
 			1: Weight = ln(1+w(vertex))
@@ -51,11 +52,13 @@ def get_weight_dictionaries(graph, choice):
 
 def give_best_coloring(graph, iterations):
 	"""
-	Main runner function, it implements the first column 
+	Main runner function for WVC, it implements the first column 
 	generation phase of the paper being referred to.
 
 	Args:
-		graph: The networkx graph on which algorithm is implemented
+		graph: The networkx graph on which algorithm is to be
+		implemented.
+		
 		iterations: The maximum number of iterations till which 
 		algorithm is repeated.
 
@@ -108,7 +111,9 @@ def get_sorted_nodes(graph):
 	of vertex weight.
 
 	Args:
-		graph: the networkx graph
+		graph: The networkx graph for which the list
+		of nodes sorted in decreasing order of vertex
+		weight is required.
 
 	Returns:
 		A list in which the nodes of the graph are

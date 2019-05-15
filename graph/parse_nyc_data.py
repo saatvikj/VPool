@@ -1,6 +1,6 @@
 from __future__ import division
 import sys
-sys.path.insert(0, 'D:/College/VPool/')
+sys.path.insert(0, 'D:/College/BTP/VPool/')
 import pandas as pd
 import utilities.ride_utility as rUtils
 from datetime import datetime
@@ -8,7 +8,27 @@ from models.Request import Request
 
 
 def osrm_table(requests):
+	"""
+	Function to create 2D arrays containing
+	information about distance between all locations
+	of the riders.
 
+	This works using the table service of the osrm
+	server.
+
+	Args:
+		requests: A list of objects of the class
+		Request corresponding to each rider in the
+		system.
+
+		port: The localhost port on which osrm server
+		is running,
+
+	Returns:
+		Three 2D arrays containg all information about
+		distances between sources, destinations and sourc
+		destination pairs.
+	"""
 	n = len(requests)
 
 	results = rUtils.polyline_encoded_table(requests)
@@ -24,15 +44,23 @@ def osrm_table(requests):
 
 	return source_data, destination_data, source_destination_data
 
+
 def create_osrm_table(requests, port):
 	"""
-	Function to create a 2D array containing
-	information about distance and travel time
-	between points.
+	Function to create 2D arrays containing
+	information about distance between all locations
+	of the riders.
+
+	This works with a point-wise query for all the
+	points using the osrm route service.
 
 	Args:
-		requests: A list of request objects
-		port: The port on which osrm is running.
+		requests: A list of objects of the class
+		Request corresponding to each rider in the
+		system.
+
+		port: The localhost port on which osrm server
+		is running.
 
 	Returns:
 		Three 2D arrays containg all information about
@@ -61,34 +89,38 @@ def create_osrm_table(requests, port):
 	return source_data, destination_data, source_destination_data
 
 
-def check_admissibility(i, j, delta_1, delta_2, source_data, destination_data, source_destination_data, delta=1.2):
+def check_admissibility(i, j, source_data, destination_data, source_destination_data, delta):
 	"""
 	Function to check whether two requests are admissible or not
 	by putting in the given criterion (flexible). Admissibility
-	is checked on the basis of difference in between source and 
-	destination.
+	is checked on the basis of ratio of distances of combined and
+	individual minimum distance routes.
 
 	Args:
 		i: Index of first request object
+
 		j: Index of second request object
-		delta_1: First condition for sources
-		delta_2: Second condition for destination
-		source_data: The array containing information about requests' sources
-		destination_data: The array containing information about requests' destinations
-		source_destination_data: The array containing information about requests' source and destinations
-		delta: Condition for total travel time
-		delta: Third condition for overall trip
+
+		source_data: Distance matrix of sources of riders
+
+		destination_data: Distance matrix of destinations
+		of riders
+
+		source_destination_data: Distance matrix of sources
+		and destinations of riders
+
+		delta: The tolerance value used for admissibility
 
 	Returns:
 		True if the two requests are admissible, false otherwise. 
 	"""
-	if source_destination_data[j][i] + source_data[i][j] <= 1.2*source_destination_data[i][i] and source_destination_data[j][i] + destination_data[i][j] <= 1.2*source_destination_data[j][j]:
+	if source_destination_data[j][i] + source_data[i][j] <= delta*source_destination_data[i][i] and source_destination_data[j][i] + destination_data[i][j] <= delta*source_destination_data[j][j]:
 		return True
-	elif source_destination_data[i][j] + destination_data[j][i] <= 1.2*source_destination_data[i][i] and source_destination_data[i][j] + source_data[j][i] <= 1.2*source_destination_data[j][j]:
+	elif source_destination_data[i][j] + destination_data[j][i] <= delta*source_destination_data[i][i] and source_destination_data[i][j] + source_data[j][i] <= delta*source_destination_data[j][j]:
 		return True
-	elif source_data[i][j]+source_destination_data[j][j]+destination_data[j][i] <= 1.2*source_destination_data[i][i]:
+	elif source_data[i][j]+source_destination_data[j][j]+destination_data[j][i] <= delta*source_destination_data[i][i]:
 		return True
-	elif source_data[j][i]+source_destination_data[i][i]+destination_data[i][j] <= 1.2*source_destination_data[j][j]:
+	elif source_data[j][i]+source_destination_data[i][i]+destination_data[i][j] <= delta*source_destination_data[j][j]:
 		return True
 	else:
 		return False
@@ -119,13 +151,18 @@ def read_dataset(filepath, time_start='2014-01-01 14:00:00', time_end='2014-01-0
 	particular day (flexible).
 
 	Args:
-		filepath: The path of the csv file.
-		time_start: Start time of subset.
-		time_end: End time of subset.
+		filepath: Full path of file containing data.
+
+		time_start: Start time to query the input
+		dataset for data.
+		
+		time_end: Start time to query the input
+		dataset for data.
 
 	Returns:
 		A pandas dataframe containing information
-		about rides of that particular time period.
+		about rides of the particular time period
+		defined by time_start and time_end.
 	"""
 	ny_dataset = pd.read_csv(filepath)
 	ny_dataset['pickup_datetime'] = ny_dataset['pickup_datetime'].map(change_string_to_datetime)
@@ -146,9 +183,13 @@ def create_request_objects(data, size_limit=100):
 	information about the requests.
 
 	Args:
-		data: The pandas dataframe
-		size_limit: The upper bound
-		on number of objects
+		data: The pandas dataframe containing
+		information about all rides.
+
+		size_limit: The upper bound on number 
+		of objects that will be created from
+		the riders, used only to categorize
+		data on the basis of input size.
 	
 	Returns:
 		A list of objects of request
@@ -165,7 +206,7 @@ def create_request_objects(data, size_limit=100):
 		return requests
 
 
-def create_adjacency_matrix(requests, delta_1, delta_2, port):
+def create_adjacency_matrix(requests, port, delta):
 	"""
 	Function to create adjacency matrix from the
 	input data in accordance with given constraints
@@ -173,12 +214,14 @@ def create_adjacency_matrix(requests, delta_1, delta_2, port):
 	algorithms applied on it.
 
 	Args:
-		requests: A list of objects of request type
-		containing information about every person
-		in the system.
-		delta_1: First condition for sources.
-		delta_2: Second condition for destination.
-		port: The port on which osrm is running.
+		requests: A list of objects of the class
+		Request corresponding to each rider in the
+		system.
+
+		port: The localhost port on which osrm server
+		is running.
+		
+		delta: The tolerance value used for admissibility
 
 	Returns:
 		4 lists having the adjacency matrix of the riders,
@@ -194,7 +237,7 @@ def create_adjacency_matrix(requests, delta_1, delta_2, port):
 	for i,first_request in enumerate(requests):
 		data = []
 		for j,second_request in enumerate(requests):
-			admissibility = check_admissibility(i, j, delta_1, delta_2, source_data, destination_data, source_destination_data, 1.2)
+			admissibility = check_admissibility(i, j, source_data, destination_data, source_destination_data, delta)
 			if admissibility == True:
 				data.append(1)
 			elif admissibility == False:
@@ -210,11 +253,11 @@ def create_distance_matrix(source_destination_data):
 	distances between all pairs of requests.
 	
 	Args:
-		requests: All the request objects
-		port: The port on which osrm is running.
+		source_destination_data: Distance matrix of sources
+		and destinations of riders
 	
 	Returns:
-		A list containing distance of each request from its destination.
+		A list containing distance of each rider from its destination.
 	"""
 
 	distances = []
@@ -224,4 +267,4 @@ def create_distance_matrix(source_destination_data):
 
 
 if __name__ == '__main__':
-	read_dataset('nyc_taxi_data_2014.csv')
+	pass

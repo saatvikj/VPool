@@ -4,7 +4,9 @@ def get_distance_from_allocation(allocation, distances):
 	from the given allocation of vehicles.
 
 	Args:
-		allocation: The allocated vehicles.
+		allocation: The vehicles allocated to 
+		the riders.
+
 		distances: Distance of each passenger from
 		its destination.
 
@@ -28,11 +30,13 @@ def get_distance_from_allocation(allocation, distances):
 def users_stats_in_coloring(allocation, distances):
 	"""
 	Gives distance between the sources of
-	two users in the allocation.
+	two users in the allocated vehicle.
 
 	Args:
 		allocation: The passengers in the vehicle.
-		distances: Distance matrix of sources.
+		
+		distances: Distance matrix of sources of the
+		riders.
 
 	Returns:
 		Average distance between sources of users

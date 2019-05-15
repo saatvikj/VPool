@@ -1,11 +1,37 @@
 from __future__ import division
 import copy
 import sys
-sys.path.insert(0, 'D:/College/VPool/')
+sys.path.insert(0, 'D:/College/BTP/VPool/')
 
 
 def occupancy_index(passengers, route, order, source_data, destination_data, source_destination_data):
+	"""
+	Function to calculate occupancy index of the
+	given vehicle with the given set of passengers.
 
+	Args:
+		passengers: A list of the passengers of the vehicle.
+
+		route: The route for the given vehicle, the route
+		is a list with index of passenger representing the
+		next point to go to.
+
+		order: The order of source and destinations in 
+		the route, S represents source and D represents
+		destination.
+
+		source_data: Distance matrix of sources of riders
+
+		destination_data: Distance matrix of destinations
+		of riders
+
+		source_destination_data: Distance matrix of sources
+		and destinations of riders
+	
+	Returns:
+		The occupancy index and total travel distance of the given
+		vehicle.
+	"""
 	total_user_travel_distance = 0.0
 	total_vehicle_travel_distance = 0.0
 
@@ -46,6 +72,36 @@ def occupancy_index(passengers, route, order, source_data, destination_data, sou
 
 
 def sharing_ratio(passengers, route, order, source_data, destination_data, source_destination_data, total_vehicle_distance):
+	"""
+	Function to calculate sharing index of the given 
+	vehicle with the given set of passengers.
+
+	Args:
+		passengers: A list of the passengers of the vehicle.
+
+		route: The route for the given vehicle, the route
+		is a list with index of passenger representing the
+		next point to go to.
+
+		order: The order of source and destinations in 
+		the route, S represents source and D represents
+		destination.
+
+		source_data: Distance matrix of sources of riders
+
+		destination_data: Distance matrix of destinations
+		of riders
+
+		source_destination_data: Distance matrix of sources
+		and destinations of riders
+		
+		total_vehicle_distance: The total distance travelled
+		by the given vehicle.
+
+	Returns:
+		The total distance of the given vehicle that was spent sharing
+		with maximum number of passengers in the ride in the vehicle.
+	"""
 	users_per_point = []
 	previous_value = 0
 	for i,passenger in enumerate(route):
@@ -69,6 +125,30 @@ def sharing_ratio(passengers, route, order, source_data, destination_data, sourc
 
 
 def in_vehicle_user_stats(passengers, route, source_data, destination_data, source_destination_data):
+	"""
+	Function to calculate route statistics of the
+	given vehicle with the given set of passengers
+	and given route that it is following.
+
+	Args:
+		passengers: A list of the passengers of the vehicle.
+
+		route: The route for the given vehicle, the route
+		is a list with index of passenger representing the
+		next point to go to.
+
+		source_data: Distance matrix of sources of riders
+
+		destination_data: Distance matrix of destinations
+		of riders
+
+		source_destination_data: Distance matrix of sources
+		and destinations of riders
+	
+	Returns:
+		The occupancy index, sharing distance and total travel 
+		distance of the given vehicle.
+	"""
 	route = route.split(" ")
 	order = []
 
@@ -85,3 +165,7 @@ def in_vehicle_user_stats(passengers, route, source_data, destination_data, sour
 	combined_sharing_distance = sharing_ratio(passengers, route, order, source_data, destination_data, source_destination_data, total_vehicle_distance)
 
 	return [occupancy_index_value, combined_sharing_distance, total_vehicle_distance]
+
+
+if __name__ == '__main__':
+	pass

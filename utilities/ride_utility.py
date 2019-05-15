@@ -7,9 +7,23 @@ import urllib
 from urllib import quote
 
 
-def polyline_encoded_table(requests):
+def polyline_encoded_table(requests, host):
+	"""
+	Function that uses the python wrapper
+	for osrm in order to get the distance
+	matrix between given input points by 
+	using the table service of the osrm server
+	hosted on the input host.
 
-	osrm.RequestConfig.host = "http://traffickarma.iiitd.edu.in:8091"	
+	Args:
+		requests: A list of objects of the class
+		Request corresponding to each rider in the
+		system.
+
+		host: Full link to the osrm server.  
+	"""
+
+	osrm.RequestConfig.host = host	
 
 	sources_data = [(i.source_long, i.source_lat) for i in requests]
 	destinations_data = [(i.dest_long, i.dest_lat) for i in requests]
@@ -33,8 +47,11 @@ def get_distance_between_points(point_1, point_2, port):
 
 	Args:
 		point_1: First point
+
 		point_2: Second point
-		port: The port running osrm.
+
+		port: The localhost port on which osrm
+		server is running.
 
 	Returns:
 		Driving distance between point_1 and
@@ -55,7 +72,9 @@ def time_between_points(points, port):
 	Args:
 		points: All points in between whom
 		time needs to be calculated.
-		port: The port running osrm.
+
+		port: The localhost port on which osrm
+		server is running
 
 	Returns:
 		A 2D array having travel time between
@@ -65,30 +84,11 @@ def time_between_points(points, port):
 	for point in points:
 		lat_long_string = lat_long_string + str(point[1]) +',' + str(point[0]) +';'
 
-	encoded_string = polyline_encoding(points)
 	non_polyline_request_string = 'http://127.0.0.1:'+str(port)+'/table/v1/driving/'+lat_long_string[:len(lat_long_string)-1]
-	polyline_request_string = 'http://127.0.0.1:5000/table/v1/driving/polyline('+quote(polyline_encoding([(point[0],point[1]) for point in points]))+')'
 	response = requests.get(polyline_request_string)
 	json_dictionary = json.loads(response.text)
 
 	return json_dictionary['durations']
-
-def polyline_encoding(points):
-	"""
-	Function to get a polyline encoded
-	string of the latitude and longitude
-	of the given point.
-
-	Args: 
-		points: The points to be encoded.
-
-	Returns:
-		A string encoding of the points.
-
-	The encoding is based on Google's
-	algorithm: http://goo.gl/PvXf8Y.
-	"""
-	return polyline.encode(points)
 
 
 def create_rates_for_slabs(distances, slab):
@@ -136,24 +136,6 @@ def get_distance_to_travel(distance_matrix):
 	return distance_matrix[number_of_people-1][:]
 
 
-def divide_and_conquer(requests):
-	"""
-	Function to appropriately divide the requests
-	into sub parts and then calculate the distance 
-	matrix for the entire part using the smaller
-	parts.
-
-	Args:
-		requests: The request objects.
-
-	Returns:
-		A 2D matrix having travel distance between 
-		all points.
-	"""
-	pass
-
-
-
 def create_average_distance_between_sources(source_data):
 	"""
 	Create distance matrix according to distance
@@ -162,8 +144,8 @@ def create_average_distance_between_sources(source_data):
 	person's source.
 
 	Args:
-		source_data: The matrix having distances
-		between each of the sources.
+		source_data: Distance matrix of sources 
+		of riders.
 
 	Returns:
 		A list of distances for each node in the vertex.
