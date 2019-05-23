@@ -60,8 +60,6 @@ def coloring_statistics(coloring, vehicles, distance_from_destination, source_da
 		distance_results = dStats.get_distance_from_allocation(allotment,distance_from_destination)
 
 		for vehicle in allotment:
-			vehilce_distances = [distance_from_destination[index] for index in vehicle.passengers]
-			maximum_vehicle_distance = max(vehilce_distances)/1000.0
 			cost_incurred = 0
 
 			file_contents = []
@@ -101,18 +99,18 @@ def coloring_statistics(coloring, vehicles, distance_from_destination, source_da
 			vehicle_distance = vehicle_distance + route_statistics[2]
 
 			if len(vehicle.passengers) == 1:
-				rates[vehicle.passengers[0]] = maximum_vehicle_distance*20
+				rates[vehicle.passengers[0]] = route_statistics[2]*20
 				single_user_vehicles += 1
 			elif vehicle.cap > 4:
 				for passenger in vehicle.passengers:
-					rates[passenger] = maximum_vehicle_distance*10
+					rates[passenger] = route_statistics[2]*10
 
 			if vehicle.cap == 4:
-				cost_incurred = maximum_vehicle_distance*15
+				cost_incurred = route_statistics[2]*15
 			elif vehicle.cap == 6:
-				cost_incurred = maximum_vehicle_distance*25
+				cost_incurred = route_statistics[2]*25
 			else:
-				cost_incurred = maximum_vehicle_distance*30
+				cost_incurred = route_statistics[2]*30
 
 			cost = cost + cost_incurred - vehicle.cost
 

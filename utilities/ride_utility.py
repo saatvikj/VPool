@@ -7,7 +7,7 @@ import urllib
 from urllib import quote
 
 
-def polyline_encoded_table(requests, host):
+def polyline_encoded_table(requests, port):
 	"""
 	Function that uses the python wrapper
 	for osrm in order to get the distance
@@ -20,10 +20,11 @@ def polyline_encoded_table(requests, host):
 		Request corresponding to each rider in the
 		system.
 
-		host: Full link to the osrm server.  
+		port: The full link to the localhost port on
+		which osrm server is running.  
 	"""
 
-	osrm.RequestConfig.host = host	
+	osrm.RequestConfig.host = port
 
 	sources_data = [(i.source_long, i.source_lat) for i in requests]
 	destinations_data = [(i.dest_long, i.dest_lat) for i in requests]
@@ -50,14 +51,14 @@ def get_distance_between_points(point_1, point_2, port):
 
 		point_2: Second point
 
-		port: The localhost port on which osrm
-		server is running.
+		port: The full link to localhost port
+		on which osrm server is running.
 
 	Returns:
 		Driving distance between point_1 and
 		point_2.
 	"""	
-	request_string = 'http://127.0.0.1:'+ str(port) +'/route/v1/driving/'+str(point_1[1])+','+str(point_1[0])+';'+str(point_2[1])+','+str(point_2[0])+'?overview=false'
+	request_string = port +'/route/v1/driving/'+str(point_1[1])+','+str(point_1[0])+';'+str(point_2[1])+','+str(point_2[0])+'?overview=false'
 	response = requests.get(request_string)
 	json_dictionary = json.loads(response.text)
 
@@ -73,8 +74,8 @@ def time_between_points(points, port):
 		points: All points in between whom
 		time needs to be calculated.
 
-		port: The localhost port on which osrm
-		server is running
+		port: The full link to localhost port
+		on which osrm server is running.
 
 	Returns:
 		A 2D array having travel time between
@@ -84,7 +85,7 @@ def time_between_points(points, port):
 	for point in points:
 		lat_long_string = lat_long_string + str(point[1]) +',' + str(point[0]) +';'
 
-	non_polyline_request_string = 'http://127.0.0.1:'+str(port)+'/table/v1/driving/'+lat_long_string[:len(lat_long_string)-1]
+	non_polyline_request_string = port+'/table/v1/driving/'+lat_long_string[:len(lat_long_string)-1]
 	response = requests.get(polyline_request_string)
 	json_dictionary = json.loads(response.text)
 

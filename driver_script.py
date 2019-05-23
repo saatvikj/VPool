@@ -57,7 +57,7 @@ def vehicles_manifest(four=525.0, six=850.0, twelve=1000.0, thirty_five=3000.0, 
 	return vehicles_list
 
 
-def runner(filename, option, text_output='vechicle_statistics.txt', output=None, time_start='2014-01-01 09:00:00', time_end='2014-01-30 22:00:00', port=5000, delta=1.2):
+def runner(filename, option, text_output='vechicle_statistics.txt', output=None, time_start='2014-01-01 09:00:00', time_end='2014-01-30 22:00:00', port='127.0.0.1:5000', delta=1.2):
 	"""
 	Main runner function that initializes the graph, 
 	assigns weights to vertices, applies all algorithms 
@@ -84,10 +84,10 @@ def runner(filename, option, text_output='vechicle_statistics.txt', output=None,
 		dataset for data, it is only needed for
 		querying the dataset when input type is CSV.
 
-		port (optional): The localhost port on which osrm 
-		server is running, it is only needed for generating
-		the distances between points after dataset is 
-		queried when input type is CSV.
+		port (optional): The full link to localhost port 
+		on which osrm server is running, it is only needed
+		for generating the distances between points after
+		dataset is queried when input type is CSV.
 
 		delta (optional): The tolerance value used for
 		admissibility, it is only used to create the graph

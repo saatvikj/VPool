@@ -21,8 +21,8 @@ def csv_to_data(csv_file_name, time_start, time_end, port, delta):
 		time_end: End time to query the input dataset
 		for data.
 
-		port: The localhost port on which osrm server
-		is running.
+		port: The full link to localhost port on which
+		osrm server is running.
 
 		delta: The tolerance value used for admissibility. 
 
@@ -34,7 +34,7 @@ def csv_to_data(csv_file_name, time_start, time_end, port, delta):
 	"""
 	data = nyc.read_dataset(csv_file_name, time_start, time_end)
 	requests = nyc.create_request_objects(data)
-	adjacency_matrix, source_data, destination_data, source_destination_data = nyc.create_adjacency_matrix(requests, 600, 600, port, delta)
+	adjacency_matrix, source_data, destination_data, source_destination_data = nyc.create_adjacency_matrix(requests, port, delta)
 	return adjacency_matrix, nyc.create_distance_matrix(source_destination_data), source_data, destination_data, source_destination_data, requests
 
 

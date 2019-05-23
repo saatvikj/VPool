@@ -7,7 +7,7 @@ from datetime import datetime
 from models.Request import Request
 
 
-def osrm_table(requests):
+def osrm_table(requests, port):
 	"""
 	Function to create 2D arrays containing
 	information about distance between all locations
@@ -21,8 +21,8 @@ def osrm_table(requests):
 		Request corresponding to each rider in the
 		system.
 
-		port: The localhost port on which osrm server
-		is running,
+		port: The full link to localhost port on which
+		osrm server is running,
 
 	Returns:
 		Three 2D arrays containg all information about
@@ -31,7 +31,7 @@ def osrm_table(requests):
 	"""
 	n = len(requests)
 
-	results = rUtils.polyline_encoded_table(requests)
+	results = rUtils.polyline_encoded_table(requests, port)
 
 	source_data = []
 	destination_data = []
@@ -59,8 +59,8 @@ def create_osrm_table(requests, port):
 		Request corresponding to each rider in the
 		system.
 
-		port: The localhost port on which osrm server
-		is running.
+		port: The full link to localhost port on which
+		osrm server is running.
 
 	Returns:
 		Three 2D arrays containg all information about
@@ -218,8 +218,8 @@ def create_adjacency_matrix(requests, port, delta):
 		Request corresponding to each rider in the
 		system.
 
-		port: The localhost port on which osrm server
-		is running.
+		port: The full link to localhost port on which
+		osrm server is running.
 		
 		delta: The tolerance value used for admissibility
 
