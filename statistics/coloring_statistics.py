@@ -9,7 +9,82 @@ import route_statistics as rStats
 import os
 
 
-def coloring_statistics(coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, rates, requests, text_output):
+def create_vehicle_text_file(i, vehicle, route_statistics, requests, rates, cost_incurred, route, root):
+	"""
+	Function to store details about all vehicles in a
+	text file in the given folder so that it can be
+	accessed later if required.
+
+	Args:
+		i: The vehicle number
+
+		vehicle: The vehicle object corresponding
+		to the vehicle number.
+
+		route_statsitics: List of statistics which
+		summarize the route of the vehicle, include
+		things like occupancy index, distance etc.
+
+		requests: A list of objects of the class
+		Request corresponding to each rider in the
+		system. 
+
+		rates: The rate that will be charged to all the 
+		riders in the system so that vehicle profit can
+		be calculated.
+
+		cost_incurred: The rate that will be charged for
+		running that particular vehicle so that vehicle
+		profit can be calculated.
+
+		route: The route for the given vehicle, the route
+		is a list with index of passenger representing the
+		next point to go to.
+
+		root: The type of coloring algorithm used to get the
+		graph coloring, needed for website.
+
+	Returns:
+		Void
+	"""
+	contents = []
+	contents.append(str(vehicle.cap)+'\n')
+	contents.append(str(len(vehicle.passengers))+'\n')
+	contents.append(str(route_statistics[2])+'\n')
+
+	profit = 0
+
+	for j in vehicle.passengers:
+		profit += rates[j]
+
+	profit -= cost_incurred
+
+	contents.append(str(profit)+'\n')
+	contents.append(str(route_statistics[0])+'\n')
+
+	string = ","
+
+	contents.append(string.join(str(v) for v in vehicle.passengers)+'\n')
+	contents.append(route+'\n')
+
+	for j in vehicle.passengers:
+		rider_content = []
+		rider_content.append(j)
+		rider_content.append(requests[j].source_lat)
+		rider_content.append(requests[j].source_long)
+		rider_content.append(requests[j].dest_lat)
+		rider_content.append(requests[j].dest_long)
+
+		string = " "
+		contents.append(string.join(str(v) for v in rider_content)+'\n')
+
+	filename = "D:\\College\\BTP\\VPool\\"+root+"\\"+str(i+1)+".txt"
+	file = open(filename,"w+")
+	file.writelines(contents)
+	file.close()
+
+
+def coloring_statistics(coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, rates, requests, text_output, root):
 	"""
 	Function to calculate statistics related to the coloring
 	obtained, statistics range from vehicle to route
@@ -41,6 +116,9 @@ def coloring_statistics(coloring, vehicles, distance_from_destination, source_da
 		text_output: The output text file used to communicate
 		with jsprit java code.
 
+		root: The type of coloring algorithm used to get the
+		graph coloring, needed for website.
+
 	Returns:
 		The statistics obtained of the given
 		coloring.
@@ -54,6 +132,7 @@ def coloring_statistics(coloring, vehicles, distance_from_destination, source_da
 	vehicle_distance = 0.0
 	single_user_vehicles = 0
 
+	i = 0
 	for color in coloring:
 		cost, allotment = iva.allot_vehicles(coloring[color], vehicles)
 		total_used_vehicles += len(allotment)
@@ -103,17 +182,21 @@ def coloring_statistics(coloring, vehicles, distance_from_destination, source_da
 				single_user_vehicles += 1
 			elif vehicle.cap > 4:
 				for passenger in vehicle.passengers:
-					rates[passenger] = route_statistics[2]*10
+					rates[passenger] = (rates[passenger]/1.5)
 
 			if vehicle.cap == 4:
-				cost_incurred = route_statistics[2]*15
+				cost_incurred = (route_statistics[2]*15)/1000.0
 			elif vehicle.cap == 6:
-				cost_incurred = route_statistics[2]*25
+				cost_incurred = (route_statistics[2]*25)/1000.0
 			else:
-				cost_incurred = route_statistics[2]*30
+				cost_incurred = (route_statistics[2]*30)/1000.0
 
 			cost = cost + cost_incurred - vehicle.cost
 
+			create_vehicle_text_file(i, vehicle, route_statistics, requests, rates, cost_incurred, route, root)
+
+			i += 1
+			
 			in_source_distances += dStats.users_stats_in_coloring(vehicle.passengers, source_data)
 			users_above_slab += vStats.user_vs_vehicle_comparison(vehicle.passengers, rates, cost_incurred)
 

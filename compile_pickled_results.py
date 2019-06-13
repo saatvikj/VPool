@@ -6,6 +6,7 @@ all results in a single compiled input CSV file.
 import datetime
 import pandas as pd
 from driver_script import runner
+import utilities.pickle_utility as pUtils
 import glob
 import sys
 
@@ -19,7 +20,8 @@ df = pd.DataFrame(columns=['Title','Size','DSATUR','WVC','Difference','DSATUR Mo
 for i,name in enumerate(filenames):
 
 	try:
-		pickle_results = runner(filename=name, option=1, text_output=sys.argv[3])
+		raw_name, size, start_time, end_time = pUtils.get_details_from_name(name)
+		pickle_results = runner(filename='nyc_taxi_data_2014.csv', option=2, time_start= start_time, time_end= end_time, output= raw_name, size_limit= size)
 		print(j)
 		df.loc[j,'Title'] = name
 		df.loc[j,'Size'] = pickle_results[0]

@@ -5,7 +5,7 @@ from graph import parse_nyc_data as nyc
 import pandas as pd
 
 
-def csv_to_data(csv_file_name, time_start, time_end, port, delta):
+def csv_to_data(csv_file_name, time_start, time_end, port, delta, size_limit):
 	"""
 	Utility function to read content present in csv
 	file written in NYC data format and put into 
@@ -24,7 +24,11 @@ def csv_to_data(csv_file_name, time_start, time_end, port, delta):
 		port: The full link to localhost port on which
 		osrm server is running.
 
-		delta: The tolerance value used for admissibility. 
+		delta: The tolerance value used for admissibility.
+
+		size_limit: The upper bound on number of objects
+		that will be created from the riders, used only
+		to categorize data on the basis of input size.
 
 	Returns:
 		Adjacency matrix, distance from destinations,
@@ -33,7 +37,7 @@ def csv_to_data(csv_file_name, time_start, time_end, port, delta):
 		pairs and list of request objects.
 	"""
 	data = nyc.read_dataset(csv_file_name, time_start, time_end)
-	requests = nyc.create_request_objects(data)
+	requests = nyc.create_request_objects(data, size_limit)
 	adjacency_matrix, source_data, destination_data, source_destination_data = nyc.create_adjacency_matrix(requests, port, delta)
 	return adjacency_matrix, nyc.create_distance_matrix(source_destination_data), source_data, destination_data, source_destination_data, requests
 

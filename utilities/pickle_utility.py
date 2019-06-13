@@ -146,5 +146,35 @@ def pickle_to_new_delta_graph(pickle_file_name, delta):
 
 	return adjacency_matrix, distance_matrix, source_data, destination_data, source_destination_data, requests
 
+
+def get_details_from_name(name):
+	"""
+	A function you make when you fuck
+	things up, takes name of pickle
+	file and returns parameters from
+	which the dataset was queried.
+
+	Args:
+		name: Name of pickle file.
+	
+	Returns:
+		Name for pickle file ize of 
+		request objects, query
+		start time, query end time.
+	
+	Thank god I used a good naming system.
+	"""
+	raw_name = name[name.index('new'):]	
+	name_details = name.split('_')
+	date = int(name_details[3])
+	start_time_hour = int(name_details[4][:2])
+	start_time_minute = int(name_details[4][2:])
+	query_length = int(name_details[5].split('.')[0])
+
+	start_time = datetime.datetime(2014,1,date,start_time_hour, start_time_minute)
+	end_time = start_time + datetime.timedelta(minutes=5)
+	
+	return raw_name, query_length, start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S')
+
 if __name__ == '__main__':
 	pass

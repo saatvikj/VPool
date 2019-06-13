@@ -7,7 +7,7 @@ import urllib
 from urllib import quote
 
 
-def polyline_encoded_table(requests, port):
+def polyline_encoded_table(request, port):
 	"""
 	Function that uses the python wrapper
 	for osrm in order to get the distance
@@ -16,7 +16,7 @@ def polyline_encoded_table(requests, port):
 	hosted on the input host.
 
 	Args:
-		requests: A list of objects of the class
+		request: A list of objects of the class
 		Request corresponding to each rider in the
 		system.
 
@@ -26,8 +26,8 @@ def polyline_encoded_table(requests, port):
 
 	osrm.RequestConfig.host = port
 
-	sources_data = [(i.source_long, i.source_lat) for i in requests]
-	destinations_data = [(i.dest_long, i.dest_lat) for i in requests]
+	sources_data = [(i.source_long, i.source_lat) for i in request]
+	destinations_data = [(i.dest_long, i.dest_lat) for i in request]
 
 	coordinates = []
 	for element in sources_data:

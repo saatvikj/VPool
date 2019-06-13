@@ -57,7 +57,7 @@ def vehicles_manifest(four=525.0, six=850.0, twelve=1000.0, thirty_five=3000.0, 
 	return vehicles_list
 
 
-def runner(filename, option, text_output='vechicle_statistics.txt', output=None, time_start='2014-01-01 09:00:00', time_end='2014-01-30 22:00:00', port='127.0.0.1:5000', delta=1.2):
+def runner(filename, option, text_output='vechicle_statistics.txt', output=None, time_start='2014-01-01 09:00:00', time_end='2014-01-01 09:05:00', port='127.0.1.1:5000', delta=1.2, size_limit=100):
 	"""
 	Main runner function that initializes the graph, 
 	assigns weights to vertices, applies all algorithms 
@@ -94,6 +94,11 @@ def runner(filename, option, text_output='vechicle_statistics.txt', output=None,
 		when tolerance levels are required to decide 
 		admissibility when input type is CSV. 
 
+		size_limit (optional): The upper bound on number 
+		of objects that will be created from the riders,
+		used only to categorize data on the basis of 
+		input size.
+
 	Returns:
 		A list of statistics corresponding to the algorithm
 		applied on input/queried data with both WVC and
@@ -116,7 +121,7 @@ def runner(filename, option, text_output='vechicle_statistics.txt', output=None,
 		adjacency_matrix, distance_matrix, source_data, destination_data, source_destination_data, requests = pUtils.unpickle_data(filename)
 		distance_from_destination = distance_matrix
 	else:
-		adjacency_matrix, distance_from_destination, source_data, destination_data, source_destination_data, requests = cUtils.csv_to_data(filename, time_start, time_end, port, delta)
+		adjacency_matrix, distance_from_destination, source_data, destination_data, source_destination_data, requests = cUtils.csv_to_data(filename, time_start, time_end, port, delta, size_limit)
 
 	if output is not None:
 		pUtils.pickle_data(adjacency_matrix, distance_from_destination, source_data, destination_data, source_destination_data, requests, output)
@@ -139,17 +144,17 @@ def runner(filename, option, text_output='vechicle_statistics.txt', output=None,
 			vehicle.cost = math.ceil(maximum_distance)*30
 
 	weight, coloring = wvc.give_best_coloring(graph, 50)
-	wvc_results = cStats.coloring_statistics(0, coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, copy.deepcopy(rates), requests, text_output)
+	wvc_results = cStats.coloring_statistics(coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, copy.deepcopy(rates), requests, text_output, 'wvc')
 
 	standard_coloring = ct.dsatur_coloring(graph)
 	standard_weight = ct.calculate_coloring_weight(graph, standard_coloring)
-	standard_coloring_results = cStats.coloring_statistics(0, standard_coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, copy.deepcopy(rates), requests, text_output)
+	standard_coloring_results = cStats.coloring_statistics(standard_coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, copy.deepcopy(rates), requests, text_output, 'std')
 
 	return [graph.number_of_nodes(), wvc_results[0], standard_coloring_results[0] , wvc_results[1]-standard_coloring_results[1], wvc_results[2], standard_coloring_results[2], wvc_results[3], standard_coloring_results[3], wvc_results[4], standard_coloring_results[4], wvc_results[5], standard_coloring_results[5], wvc_results[6], standard_coloring_results[6], wvc_results[7], standard_coloring_results[7]]
 
 
 if __name__ == '__main__':
 	if len(sys.argv) > 3:
-		runner(sys.argv[2],sys.argv[1], sys.argv[3])
+		print(runner(sys.argv[2],sys.argv[1], output=sys.argv[3]))
 	else:
-		runner(sys.argv[2], sys.argv[1])
+		print(runner(sys.argv[2], sys.argv[1]))

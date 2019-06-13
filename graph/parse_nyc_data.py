@@ -176,7 +176,7 @@ def read_dataset(filepath, time_start='2014-01-01 14:00:00', time_end='2014-01-0
 	return subset
 
 
-def create_request_objects(data, size_limit=100):
+def create_request_objects(data, size_limit):
 	"""
 	Function to create request objects
 	from the pandas dataframe containg
@@ -233,7 +233,7 @@ def create_adjacency_matrix(requests, port, delta):
 	"""
 	adjacency_matrix = []
 	# source_data, destination_data, source_destination_data = create_osrm_table(requests, port)
-	source_data, destination_data, source_destination_data = osrm_table(requests)
+	source_data, destination_data, source_destination_data = osrm_table(requests, port)
 	for i,first_request in enumerate(requests):
 		data = []
 		for j,second_request in enumerate(requests):
