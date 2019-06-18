@@ -126,7 +126,7 @@ def runner(filename, option, text_output='vechicle_statistics.txt', output=None,
 	if output is not None:
 		pUtils.pickle_data(adjacency_matrix, distance_from_destination, source_data, destination_data, source_destination_data, requests, output)
 
-	maximum_distance = max(distance_from_destination)/1000.0
+	maximum_distance = max(distance_from_destination)
 	graph = init.create_graph_from_input(adjacency_matrix)
 	rates = rUtils.create_rates_for_slabs(distance_from_destination, slab)
 	average_distances = rUtils.create_average_distance_between_sources(source_data)

@@ -59,7 +59,7 @@ def create_vehicle_text_file(i, vehicle, route_statistics, requests, rates, cost
 
 	profit -= cost_incurred
 
-	contents.append(str(profit)+'\n')
+	contents.append(str(profit/1000.0)+'\n')
 	contents.append(str(route_statistics[0])+'\n')
 
 	string = ","
@@ -172,7 +172,12 @@ def coloring_statistics(coloring, vehicles, distance_from_destination, source_da
 
 			query_string = 'java -jar vehicle_routing.jar ' + text_output
 			route = os.popen(query_string).read()
-			route_statistics = rStats.in_vehicle_user_stats(vehicle.passengers, route, source_data, destination_data, source_destination_data)
+ 
+			if len(vehicle.passengers) == 1:
+				route_statistics = [1.0,source_destination_data[vehicle.passengers[0]][vehicle.passengers[0]],source_destination_data[vehicle.passengers[0]][vehicle.passengers[0]]]
+			else:
+				route_statistics = rStats.in_vehicle_user_stats(vehicle.passengers, route, source_data, destination_data, source_destination_data)
+
 			average_ratio = average_ratio + route_statistics[0]
 			combined_distance = combined_distance + route_statistics[1]
 			vehicle_distance = vehicle_distance + route_statistics[2]
@@ -185,11 +190,11 @@ def coloring_statistics(coloring, vehicles, distance_from_destination, source_da
 					rates[passenger] = (rates[passenger]/1.5)
 
 			if vehicle.cap == 4:
-				cost_incurred = (route_statistics[2]*15)/1000.0
+				cost_incurred = (route_statistics[2]*15)
 			elif vehicle.cap == 6:
-				cost_incurred = (route_statistics[2]*25)/1000.0
+				cost_incurred = (route_statistics[2]*25)
 			else:
-				cost_incurred = (route_statistics[2]*30)/1000.0
+				cost_incurred = (route_statistics[2]*30)
 
 			cost = cost + cost_incurred - vehicle.cost
 
@@ -203,11 +208,11 @@ def coloring_statistics(coloring, vehicles, distance_from_destination, source_da
 		total_operator_cost += cost
 
 	revenue = sum(rates)-total_operator_cost
-		
+	
 	average_ratio = average_ratio/total_used_vehicles
 	combined_distance = combined_distance/total_used_vehicles
 	vehicle_distance = vehicle_distance/total_used_vehicles
-	return [revenue, in_source_distances/total_used_vehicles, users_above_slab, total_used_vehicles, average_ratio, combined_distance/vehicle_distance, single_user_vehicles, vehicle_distance]
+	return [revenue/1000.0, in_source_distances/total_used_vehicles, users_above_slab, total_used_vehicles, average_ratio, combined_distance/vehicle_distance, single_user_vehicles, vehicle_distance]
 
 
 	if __name__ == '__main__':

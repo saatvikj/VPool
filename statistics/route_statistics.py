@@ -64,7 +64,7 @@ def occupancy_index(passengers, route, order, source_data, destination_data, sou
 
 			i = i + 1
 
-	if total_vehicle_travel_distance == 0:
+	if total_vehicle_travel_distance == 0.0:
 		return 1, 0
 	else:
 		return total_user_travel_distance/(len(passengers)*total_vehicle_travel_distance), total_vehicle_travel_distance
