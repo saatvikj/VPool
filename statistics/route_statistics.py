@@ -1,7 +1,8 @@
 from __future__ import division
 import copy
 import sys
-sys.path.insert(0, 'D:/College/BTP/VPool/')
+import os
+sys.path.insert(0,os.path.abspath(os.path.join(os.getcwd(),os.pardir)))
 
 
 def occupancy_index(passengers, route, order, source_data, destination_data, source_destination_data):

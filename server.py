@@ -7,7 +7,7 @@ import driver_script
 
 
 number_of_vehicles = 5
-app = Flask(__name__, template_folder='./static', static_folder='D:\\College\\BTP\\VPool\\static', static_url_path='/static')
+app = Flask(__name__, template_folder='./static', static_folder='./static', static_url_path='/static')
 
 
 def marker_to_js(route):
@@ -23,18 +23,22 @@ def marker_to_js(route):
 
 	Returns:
 		A list of strings corresponding to each
-		marker in the map.
+		marker in the map and a list telling the
+		order of points, S or D.
 	"""
 	sources = []
 	popup = []
+	order = []
 	for i in route:
 		if i not in sources:
 			sources.append(i)
 			popup.append('Source of '+str(i))
+			order.append('S')
 		else:
-			popup.append('Destination of '+str(i))			
+			popup.append('Destination of '+str(i))
+			order.append('D')
 
-	return popup
+	return popup, order
 
 
 def point_to_js(points):
@@ -114,6 +118,9 @@ def index():
 
 		delta = float(request.form['delta'])
 		country = request.form['name']
+		time_start = request.form['start-time']
+		time_end = request.form['end-time']
+		size_limit = request.form['size-limit']
 
 		if country == 'India':
 			host = 'http://traffickarma.iiitd.edu.in:8091'
@@ -126,7 +133,7 @@ def index():
 		if extension == '.pkl':
 			results = driver_script.runner(os.path.join(os.getcwd(),filename), 1, delta = delta, port = host)
 		else:
-			results = driver_script.runner(os.path.join(os.getcwd(),filename), 2, delta = delta, time_start = '2014-01-01 10:00:00', time_end='2014-01-01 10:05:00', port = host)
+			results = driver_script.runner(os.path.join(os.getcwd(),filename), 2, delta = delta, time_start = time_start, time_end=time_end, port = host, size_limit=size_limit)
 		number_of_vehicles = results[7] if results[7] > results[6] else results[6]
 		return render_template('index.html', results = results)
 
@@ -148,10 +155,10 @@ def display_vehicle_results():
 		number = '1'
 		contents = get_vehicle_details(number, 'std')
 		vehicle = contents[:6]
-
-		std_vehicles = len(glob.glob('D:/College/BTP/VPool/std/*.txt'))
-		wvc_vehicles = len(glob.glob('D:/College/BTP/VPool/wvc/*.txt'))
-
+		
+		std_vehicles = len(glob.glob(os.getcwd()+'/std/*.txt'))
+		wvc_vehicles = len(glob.glob(os.getcwd()+'/wvc/*.txt'))
+		
 		number_of_vehicles = std_vehicles if std_vehicles > wvc_vehicles else wvc_vehicles
 
 		route = contents[6].split(" ")
@@ -177,7 +184,9 @@ def display_vehicle_results():
 		ave_lat = sum(p[0] for p in points)/len(points)
 		ave_lon = sum(p[1] for p in points)/len(points)
 
-		return render_template('map.html', length=number_of_vehicles, vehicle=vehicle, points = point_to_js(points), lat=ave_lat, long=ave_lon, coloring='Standard', number=number, popup=marker_to_js(route))
+		popup, order = marker_to_js(route)
+
+		return render_template('map.html', length=number_of_vehicles, vehicle=vehicle, points = point_to_js(points), lat=ave_lat, long=ave_lon, coloring='Standard', number=number, popup=popup, order=order)
 
 	if request.method == 'POST':
 		number = request.form['vehicle']
@@ -191,8 +200,8 @@ def display_vehicle_results():
 		contents = get_vehicle_details(number, root)
 		vehicle = contents[:6]
 
-		std_vehicles = len(glob.glob('D:/College/BTP/VPool/std/*.txt'))
-		wvc_vehicles = len(glob.glob('D:/College/BTP/VPool/wvc/*.txt'))
+		std_vehicles = len(glob.glob(os.getcwd()+'/std/*.txt'))
+		wvc_vehicles = len(glob.glob(os.getcwd()+'/wvc/*.txt'))
 
 		number_of_vehicles = std_vehicles if std_vehicles > wvc_vehicles else wvc_vehicles
 
@@ -219,7 +228,9 @@ def display_vehicle_results():
 		ave_lat = sum(p[0] for p in points)/len(points)
 		ave_lon = sum(p[1] for p in points)/len(points)
 
-		return render_template('map.html', length=number_of_vehicles, vehicle=vehicle, points = point_to_js(points), lat=ave_lat, long=ave_lon, coloring=root_string, number=number, popup=marker_to_js(route))
+		popup, order = marker_to_js(route)
+
+		return render_template('map.html', length=number_of_vehicles, vehicle=vehicle, points = point_to_js(points), lat=ave_lat, long=ave_lon, coloring='Standard', number=number, popup=popup, order=order)
 
 
 if __name__ == '__main__':

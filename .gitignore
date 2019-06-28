@@ -7,9 +7,6 @@ gurobi.log
 *.txt
 /data
 /results
-/std
-/wvc
-/static
 iterate_dataset_5000.py
 iterate_dataset_6000.py
 iterate_dataset_7000.py

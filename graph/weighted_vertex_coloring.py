@@ -1,6 +1,7 @@
 from __future__ import division
 import sys
-sys.path.insert(0, 'D:/College/BTP/VPool/')
+import os
+sys.path.insert(0,os.path.abspath(os.path.join(os.getcwd(),os.pardir)))
 import networkx as nx
 import math
 import random

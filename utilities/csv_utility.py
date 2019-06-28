@@ -1,6 +1,7 @@
 import pickle_utility as pkl
 import sys
-sys.path.insert(0, 'D:/College/BTP/VPool/')
+import os
+sys.path.insert(0,os.path.abspath(os.path.join(os.getcwd(),os.pardir)))
 from graph import parse_nyc_data as nyc
 import pandas as pd
 

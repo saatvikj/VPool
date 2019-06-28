@@ -1,12 +1,12 @@
 from __future__ import division
 import copy
 import sys
-sys.path.insert(0, 'D:/College/BTP/VPool/')
+import os
+sys.path.insert(0,os.path.abspath(os.path.join(os.getcwd(),os.pardir)))
 import optimization.infinite_vehicle_allocator as iva
 import distance_statistics as dStats
 import vehicle_statistics as vStats
 import route_statistics as rStats
-import os
 
 
 def create_vehicle_text_file(i, vehicle, route_statistics, requests, rates, cost_incurred, route, root):
@@ -78,7 +78,7 @@ def create_vehicle_text_file(i, vehicle, route_statistics, requests, rates, cost
 		string = " "
 		contents.append(string.join(str(v) for v in rider_content)+'\n')
 
-	filename = "D:\\College\\BTP\\VPool\\"+root+"\\"+str(i+1)+".txt"
+	filename = os.getcwd()+"\\"+root+"\\"+str(i+1)+".txt"
 	file = open(filename,"w+")
 	file.writelines(contents)
 	file.close()

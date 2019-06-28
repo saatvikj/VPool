@@ -2,7 +2,8 @@ import pickle
 import datetime
 import numpy
 import sys
-sys.path.insert(0,'D:/College/BTP/VPool/')
+import os
+sys.path.insert(0,os.path.abspath(os.path.join(os.getcwd(),os.pardir)))
 import graph.parse_nyc_data as nyc
 
 
