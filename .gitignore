@@ -3,7 +3,6 @@ gurobi.log
 *.pyc
 *.csv
 *.pkl
-*.html
 *.txt
 /data
 /results

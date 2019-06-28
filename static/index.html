@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>VPool</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" href="/static/images/icons/favicon.ico"/>
+	<link rel="stylesheet" type="text/css" href="/static/vendor/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/vendor/animate/animate.css">
+	<link rel="stylesheet" type="text/css" href="/static/vendor/css-hamburgers/hamburgers.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/vendor/animsition/css/animsition.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/vendor/select2/select2.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/vendor/daterangepicker/daterangepicker.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/util.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/main.css">
+</head>
+<body>
+	<div id="left"></div>
+	<div id="right"></div>
+	<div id="top"></div>
+	<div id="bottom"></div>
+	
+	<div class="container-contact100">
+		<div class="wrap-contact100">
+			{% if results is not defined %}
+			<form class="contact100-form" action="/" method="POST" enctype="multipart/form-data">
+				<span class="contact100-form-title">
+					VPool
+				</span>
+
+				<div class="wrap-input100 validate-input" data-tip="Name of the place where data is from.">
+					<input class="input100" type="text" name="name" placeholder="Name of location">
+					<span class="focus-input100"></span>						
+				</div>
+
+				<div class="wrap-input100 validate-input" data-tip="Delta represents the tolerance for admissibility, a value of 1.2 means shared distance can be 1.2 times the shortest possible distance.">
+					<input class="input100" type="text" name="delta" placeholder="Delta">
+					<span class="focus-input100"></span>
+				</div>
+
+				<div class="wrap-input100 validate-input" data-tip="All available vehicle sizes (4,6,12,35,41 is default). Enter NA to use default.">
+					<input class="input100" type="text" name="vehicles" placeholder="Available Vehicles">
+					<span class="focus-input100"></span>
+				</div>
+
+				<div class="wrap-input100 validate-input" data-tip="The timestamp to start querying the dataset from for data. Format should be YYYY-MM-DD HH:MM:SS only (Enter NA if input type is pickle).">
+					<input type="text" name="start-time" class="input100" style="padding-top: 8px" placeholder="Query Time Start">
+					<span class="focus-input100"></span>
+				</div>
+
+				<div class="wrap-input100 validate-input" data-tip="The timestamp to end querying the dataset from for data. Format should be YYYY-MM-DD HH:MM:SS only (Enter NA if input type is pickle).">
+					<input type="text" name="end-time" class="input100" style="padding-top: 8px" placeholder="Query Time End">
+					<span class="focus-input100"></span>
+				</div>
+
+				<div class="wrap-input100 validate-input" data-tip="Limit to the amount of requests being considered from the queried dataset. (Enter NA if input type is pickle).">
+					<input type="text" name="size-limit" class="input100" style="padding-top: 8px" placeholder="Size Limit">
+					<span class="focus-input100"></span>
+				</div>
+
+				<div class="wrap-input100 validate-input" data-tip="Enter data, can be .csv or .pkl only, select download button on top to view format.">
+					<input type="file" name="csv" class="input100" style="padding-top: 14px">
+					<span class="focus-input100"></span>
+				</div>
+
+				<div class="container-contact100-form-btn">
+					<button class="contact100-form-btn">
+						<span>
+							<i class="fa fa-paper-plane-o m-r-6" aria-hidden="true"></i>
+							Upload and Run
+						</span>
+					</button>
+				</div>
+			</form>
+			
+			{% else %}
+			<span class="contact100-form-title">
+				Results Summary
+			</span>
+
+			<div class="wrap-input100" style="padding: 18px;">
+				<span class="contact100-form-title" style="font-size: 18px; padding-bottom: 4px; font-family: Roboto">
+				WVC
+				</span>
+			
+				Number of vehicles used: {{ results[6] }}<br>
+				Total profit obtained: {{ results[1] }}<br>
+				Average Occupancy Index: {{ results[8] }}<br>
+				Ratio of rides shared: {{ 1-(results[12]/results[0]) }}<br>
+				Ratio of shared vehicles: {{ 1-(results[12]/results[6]) }}<br>
+			</div>
+
+			<div class="wrap-input100" style="padding: 18px">
+				<span class="contact100-form-title" style="font-size: 18px; padding-bottom: 4px; font-family: Roboto">
+				Standard Coloring
+				</span>
+
+				Number of vehicles used: {{ results[7] }}<br>
+				Total profit obtained: {{ results[2] }}<br>
+				Average Occupancy Index: {{ results[9] }}<br>
+				Ratio of rides shared: {{ 1-(results[12]/results[0]) }}<br>
+				Ratio of shared vehicles: {{ 1-(results[12]/results[7]) }}<br>
+			</div>
+
+			<div class="container-contact100-form-btn">
+				<a href="/results" class="contact100-form-btn">
+					<span>
+						<i class="fa fa-paper-plane-o m-r-6" aria-hidden="true"></i>
+						View Detailed Results
+					</span>
+				</a>
+			</div>
+		{% endif %}	
+		</div>
+
+		<div class="sidebar">
+			<i class="fa fa-info-circle" onclick="showDetailsModal()"></i>
+			<i class="fa fa-download" onclick="showDownloadModal()"></i>
+		</div>
+
+		<div id="detailsModal" class="modal">
+			<div class="modal-content">
+		    	<span class="close">&times;</span>
+				<p>
+					VPool is a ride sharing system that caters to both operators and riders economically while maintaining a good quality ride sharing. Enter the given details in the form and have a look at detailed ride sharing solution for your entered rides. The solution comes equipped with economical insights for both passengers and operators, along with parameters like occupancy index and number of shared rides for quality check.<br>
+					The pricing details for vehicles is as follows- <br>
+					<div class="list">
+						For vehicles with capacity <= 4, cost = Rs. 15/km <br>
+						For vehicles with capcity between 4 and 6, cost = Rs. 25/km <br>
+						For vehicles with capacity over 6, cost = Rs. 35/km
+					</div>
+				</p>
+				<p style="padding-top: 4px">
+					For riders, the pricing details are as follows-<br>
+					<div class="list">
+						For riders travelling alone, cost = Rs. 20/km <br>
+						For riders travelling in 4 seater vehicles, cost = Rs. 15/km <br>
+						For riders travelling in larger than 4 seater vehicles, cost = Rs. 10/km
+					</div>
+					<p>
+					<b>Please note that all data on the results page will be wiped out completely when you close the tab/window. Currently saving of data isn't supported.</b>
+					</p>
+				</p>
+			</div>
+		</div>
+
+		<div id="downloadModal" class="modal">
+			<div class="modal-content">
+		    	<span class="close">&times;</span>
+				<p>
+					All data entered should be either a csv file, or a pkl file. The csv file should contain these major required details: <b>pickup_datetime, pickup_latitude, pickup_longitude, dropoff_latitude, dropoff_longitude and passenger_count.</b> If, however, you want to preprocess your data and submit a .pkl file instead, the file should contain a dictionary with the following as keys and corresponding values as values-<br>
+
+					<div class="list">
+						<b>1) admissibility_matrix:</b> A 2D list where a[i][j] = 1 if rider i and j are admissible, 0 otherwise.<br>
+						<b>2) distance_matrix:</b> A list where a[i] is travel distance b/w source and destination of rider i.<br>
+						<b>3) source_data:</b>A 2D list where a[i][j] is travel distance b/w sources of riders i and j.<br>
+						<b>4) destination_data:</b>A 2D list where a[i][j] is travel distance b/w destinations of riders i and j.<br>
+						<b>5) source_destination_data:</b>A 2D list where a[i][j] is travel distance b/w source of rider i and destination of rider j.<br>
+						<b>6) requests:</b> A list of objects of class Request corresponding to each rider, obtained after reading the dataset. Request class can be found <a href="https://github.com/saatvikj/VPool/blob/master/models/Request.py" target="_blank">here</a>. 
+					</div>
+				</p>
+
+				<p style="padding-top: 0px">
+					Please note that all names are case sensitive, distances should be in metres only and data should be pickled using Python 2.7.15 only. Click <a href="">here</a> to download a sample csv and <a href="">here</a> to download a sample pickle file.
+				</p>
+			</div>
+		</div>
+	</div>
+
+
+	<script src="/static/vendor/jquery/jquery-3.2.1.min.js"></script>
+	<script src="/static/vendor/animsition/js/animsition.min.js"></script>
+	<script src="/static/vendor/bootstrap/js/popper.js"></script>
+	<script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/static/vendor/select2/select2.min.js"></script>
+	<script src="/static/vendor/daterangepicker/moment.min.js"></script>
+	<script src="/static/vendor/daterangepicker/daterangepicker.js"></script>
+	<script src="/static/vendor/countdowntime/countdowntime.js"></script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13"></script>
+	
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		gtag('config', 'UA-23581568-13');
+
+		var details_modal = document.getElementById("detailsModal");
+		var download_modal = document.getElementById("downloadModal");
+		var span = document.getElementsByClassName("close")[0];
+		var span_copy = document.getElementsByClassName("close")[1];
+
+		span.onclick = function() {
+		  details_modal.style.display = "none";
+		}
+
+		span_copy.onclick = function() {
+			download_modal.style.display = "none";
+		}
+
+		function showDetailsModal() {
+			var details_modal = document.getElementById("detailsModal");
+			details_modal.style.display = "block";
+		}
+
+		function showDownloadModal() {
+			var download_modal = document.getElementById("downloadModal");
+			download_modal.style.display = "block";
+		}
+
+		window.onclick = function(event) {
+			if (event.target == download_modal || event.target == details_modal) {
+				details_modal.style.display = "none";
+				download_modal.style.display = "none";
+			}
+		}
+
+		document.onkeydown = function(event) {
+			event = event || window.event;
+			if (event.keyCode == 27) {
+				details_modal.style.display = "none";
+				download_modal.style.display = "none";					
+			}
+		};
+
+	</script>
+
+</body>
+</html>

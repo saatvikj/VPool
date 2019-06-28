@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Results</title>
+		<link rel="icon" type="image/png" href="/static/images/icons/favicon.ico"/>
+		<script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+
+		<link rel="stylesheet" href="/static/css/result.css">
+
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+		integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+		crossorigin=""/>
+
+		<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+		integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+		crossorigin=""></script>
+
+		<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+		<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+		
+		<script>
+			function alertForRoute() {
+				var visited = localStorage.getItem('visited');
+				if (!visited) {
+					alert("This page shows the route, however sometimes the route may not show due to loading issues, please refresh in case it doesn't. The green marker represents the starting point and you can follow the remaining route from the directions on the side. Click on marker to see which point it represents.");
+					localStorage.setItem('visited', true);
+				}
+			}
+
+			function openSlider() {
+				document.getElementById('menu').style.width = '270px';
+				document.getElementById('content').style.marginLeft = '270px'
+				document.getElementsByClassName('slide')[0].style.visibility = 'hidden'
+			}
+
+			function closeSlider() {
+				document.getElementById('menu').style.width = '0';
+				document.getElementById('content').style.marginLeft = '0'
+				document.getElementsByClassName('slide')[0].style.visibility = 'visible'
+			}
+		</script>
+
+	</head>
+	<body onload="alertForRoute()">
+
+		<div id="content">
+			
+			<span class="slide">
+				<a href="#" onclick="openSlider()" style="color: #000000">
+					<i class="fas fa-bars"></i>
+				</a>
+			</span>
+
+			<div id="menu" class="nav">
+				<a href="#" class="close" onclick="closeSlider()">
+					<i class="fas fa-times"></i>
+				</a>
+				<h2 class="slider-headings">Vehicle Statistics</h2>
+				<div class="list-type4">
+					<ol>
+						<li><a href="#" style="color: #FCD736;">Capacity:	{{ vehicle[0] }}</a></li>
+						<li><a href="#" style="color: #FCD736;">Passenger Count:	{{ vehicle[1] }}</a></li>
+						<li><a href="#" style="color: #FCD736;">Distance:	{{ (vehicle[2] | float)/1000 }}km</a></li>
+						<li><a href="#" style="color: #FCD736;">Occupancy Index:	{{ vehicle[4] }}</a></li>
+						<li><a href="#" style="color: #FCD736;">Profit Obtained:	Rs.{{ vehicle[3] }}</a></li>
+						<li><a href="#" style="color: #FCD736">Passengers:	{{ vehicle[5] }}</a></li>
+					</ol>
+				</div>
+				<h2 class="slider-headings">Currently Chosen</h2>
+				<div class="list-type4">
+					<ol>
+						<li><a href="#" style="color: #FCD736;">Vehicle Number {{ number }}</a></li>
+						<li><a href="#" style="color: #FCD736;">Coloring Type: {{ coloring }}</a></li>
+					</ol>
+				</div>
+				<h2 class="slider-headings">Select New Vehicle</h2>
+				<form action="/results" method="POST">
+					<div class="form-option">
+						<label>Vehicle Number</label><br>
+						<select name="vehicle">
+							{% for i in range(0,length) %}
+							{% if i+1 == (number | int) %}
+							<option value="{{i+1}}" selected="selected">Vehicle {{i+1}}</option>
+							{% else %}
+							<option value="{{i+1}}">Vehicle {{i+1}}</option>
+							{% endif %}
+							{% endfor %}
+						</select>					
+					</div>
+					<div class="form-option">
+						<label>Coloring type</label><br>
+						<select name="root">
+							{% if coloring == 'WVC' %}
+							<option value="wvc" selected="selected">WVC</option>
+							{% else %}
+							<option value="wvc">WVC</option>
+							{% endif %}						
+							{% if coloring == 'Standard' %}
+							<option value="std" selected="selected">Standard</option>
+							{% else %}
+							<option value="std">Standard</option>
+							{% endif %}						
+						</select>
+					</div>
+					<div class="form-option">
+						<input type="submit" value="Go">					
+					</div>
+				</form>
+			</div>
+			
+			<script>
+
+				var mymap = L.map('content', {zoomControl: false});
+				new L.Control.Zoom({ position: 'topright' }).addTo(mymap);
+				mymap.setView([{{ lat }},{{ long }}], 15);
+
+				L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+				    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+				    maxZoom: 18,
+				    id: 'mapbox.streets',
+				    accessToken: 'pk.eyJ1Ijoic2FhdHZpa2oiLCJhIjoiY2pyOHV6NHRxMDE3YjN6bDliM2N5ZGd1aSJ9.xXEL06DYefip4LVCVMZGWQ'
+				}).addTo(mymap);
+
+				var pointList = {{ points }};
+				var popups = {{ popup | tojson }};
+				var order = {{ order | tojson }};
+				var i;
+				var greenIcon = new L.Icon({
+				  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+				  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+				  iconSize: [25, 41],
+				  iconAnchor: [12, 41],
+				  popupAnchor: [1, -34],
+				  shadowSize: [41, 41]
+				});
+			
+				var control = L.Routing.control({
+					waypoints: pointList,
+					waypointMode: 'snap',
+					createMarker: function (i, start) {
+						if (i == 0) {
+							var marker = L.marker(start.latLng, {icon: greenIcon});
+							marker.bindPopup(popups[i].concat("<br> This is the starting point of the route.")).openPopup();
+							return marker
+						} else {
+							var marker = L.marker(start.latLng);
+							marker.bindPopup(popups[i]);
+							return marker
+						}
+					}
+				}).addTo(mymap);
+			</script>
+		</div>
+	</body>
+</html>
