@@ -234,4 +234,4 @@ def display_vehicle_results():
 
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(port='16000', debug=False)
