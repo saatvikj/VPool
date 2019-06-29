@@ -5,7 +5,6 @@ from utilities import pickle_utility as pUtils
 from utilities import csv_utility as cUtils
 from utilities import ride_utility as rUtils
 from optimization import infinite_vehicle_allocator as iva
-from optimization import naive_wvc_solution as naive
 from optimization import minimum_approximate as ma
 from graph import coloring_techniques as ct
 from graph import parse_nyc_data as nyc
