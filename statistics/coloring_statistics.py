@@ -84,7 +84,7 @@ def create_vehicle_text_file(i, vehicle, route_statistics, requests, rates, cost
 	file.close()
 
 
-def coloring_statistics(coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, rates, requests, text_output, root):
+def coloring_statistics(coloring, vehicles, distance_from_destination, source_data, destination_data, source_destination_data, rates, requests, text_output, root, start='40.730610,-73.935242\n'):
 	"""
 	Function to calculate statistics related to the coloring
 	obtained, statistics range from vehicle to route
@@ -119,6 +119,9 @@ def coloring_statistics(coloring, vehicles, distance_from_destination, source_da
 		root: The type of coloring algorithm used to get the
 		graph coloring, needed for website.
 
+		start: A string representing the starting position of the
+		vehicle. Center of new york by default.
+
 	Returns:
 		The statistics obtained of the given
 		coloring.
@@ -152,19 +155,19 @@ def coloring_statistics(coloring, vehicles, distance_from_destination, source_da
 
 			file_contents.append(occupants_string+'\n')
 
-			file_contents.append('40.730610,-73.935242\n')
+			file_contents.append(start)
 
 			for user in vehicle.passengers:
 				if requests[user].source_lat != 0.0:
 					file_contents.append(str(requests[user].source_lat)+','+str(requests[user].source_long)+'\n')
 				else:
-					file_contents.append('40.730610,-73.935242\n')
+					file_contents.append(start)
 
 			for user in vehicle.passengers:
 				if requests[user].dest_lat != 0.0:
 					file_contents.append(str(requests[user].dest_lat)+','+str(requests[user].dest_long)+'\n')			
 				else:
-					file_contents.append('40.730610,-73.935242\n')			
+					file_contents.append(start)			
 
 			file = open(text_output,"w+")
 			file.writelines(file_contents)

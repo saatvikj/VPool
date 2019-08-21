@@ -230,7 +230,7 @@ def display_vehicle_results():
 
 		popup, order = marker_to_js(route)
 
-		return render_template('map.html', length=number_of_vehicles, vehicle=vehicle, points = point_to_js(points), lat=ave_lat, long=ave_lon, coloring='Standard', number=number, popup=popup, order=order)
+		return render_template('map.html', length=number_of_vehicles, vehicle=vehicle, points = point_to_js(points), lat=ave_lat, long=ave_lon, coloring=root_string, number=number, popup=popup, order=order)
 
 
 if __name__ == '__main__':

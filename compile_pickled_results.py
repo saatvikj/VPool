@@ -21,7 +21,7 @@ for i,name in enumerate(filenames):
 
 	try:
 		raw_name, size, start_time, end_time = pUtils.get_details_from_name(name)
-		pickle_results = runner(filename='nyc_taxi_data_2014.csv', option=2, time_start= start_time, time_end= end_time, output= raw_name, size_limit= size)
+		pickle_results = runner(filename=name, option=1)
 		print(j)
 		df.loc[j,'Title'] = name
 		df.loc[j,'Size'] = pickle_results[0]

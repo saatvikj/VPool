@@ -4,6 +4,7 @@ import os
 sys.path.insert(0,os.path.abspath(os.path.join(os.getcwd(),os.pardir)))
 import pandas as pd
 import utilities.ride_utility as rUtils
+import random
 from datetime import datetime
 from models.Request import Request
 
@@ -90,7 +91,7 @@ def create_osrm_table(requests, port):
 	return source_data, destination_data, source_destination_data
 
 
-def check_admissibility(i, j, source_data, destination_data, source_destination_data, delta):
+def check_admissibility(i, j, source_data, destination_data, source_destination_data, delta, i_travelled = 0, j_travelled = 0):
 	"""
 	Function to check whether two requests are admissible or not
 	by putting in the given criterion (flexible). Admissibility
@@ -112,16 +113,20 @@ def check_admissibility(i, j, source_data, destination_data, source_destination_
 
 		delta: The tolerance value used for admissibility
 
+		i_travelled: Distance already travelled by rider i.
+
+		j_travelled: Distance already travelled by rider j.
+
 	Returns:
 		True if the two requests are admissible, false otherwise. 
 	"""
-	if source_destination_data[j][i] + source_data[i][j] <= delta*source_destination_data[i][i] and source_destination_data[j][i] + destination_data[i][j] <= delta*source_destination_data[j][j]:
+	if source_destination_data[j][i] + source_data[i][j] <= delta*source_destination_data[i][i] - i_travelled and source_destination_data[j][i] + destination_data[i][j] <= delta*source_destination_data[j][j] - j_travelled:
 		return True
-	elif source_destination_data[i][j] + destination_data[j][i] <= delta*source_destination_data[i][i] and source_destination_data[i][j] + source_data[j][i] <= delta*source_destination_data[j][j]:
+	elif source_destination_data[i][j] + destination_data[j][i] <= delta*source_destination_data[i][i] - i_travelled and source_destination_data[i][j] + source_data[j][i] <= delta*source_destination_data[j][j] - j_travelled:
 		return True
-	elif source_data[i][j]+source_destination_data[j][j]+destination_data[j][i] <= delta*source_destination_data[i][i]:
+	elif source_data[i][j]+source_destination_data[j][j]+destination_data[j][i] <= delta*source_destination_data[i][i] - i_travelled and j_travelled <= (delta-1)*source_destination_data[j][j]:
 		return True
-	elif source_data[j][i]+source_destination_data[i][i]+destination_data[i][j] <= delta*source_destination_data[j][j]:
+	elif source_data[j][i]+source_destination_data[i][i]+destination_data[i][j] <= delta*source_destination_data[j][j] - j_travelled and i_travelled <= (delta-1)*source_destination_data[i][i]:
 		return True
 	else:
 		return False
@@ -172,8 +177,9 @@ def read_dataset(filepath, time_start='2014-01-01 14:00:00', time_end='2014-01-0
 	time_end = change_string_to_datetime(time_end)
 	start_condition = ny_dataset['pickup_datetime'] > time_start
 	end_condition = ny_dataset['pickup_datetime'] < time_end
+	airport_condition = ny_dataset['rate_code'] == 1
 
-	subset = ny_dataset[start_condition & end_condition]
+	subset = ny_dataset[start_condition & end_condition & airport_condition]
 	return subset
 
 
@@ -202,7 +208,7 @@ def create_request_objects(data, size_limit):
 		requests.append(request)
 
 	if len(requests) > size_limit:
-		return requests[:size_limit]
+		return random.sample(requests, size_limit)
 	else:
 		return requests
 

@@ -3,9 +3,10 @@ gurobi.log
 *.pyc
 *.csv
 *.pkl
-*.txt
+vehicle_statistics.txt
 /data
 /results
+plot_data.py
 iterate_dataset_5000.py
 iterate_dataset_6000.py
 iterate_dataset_7000.py

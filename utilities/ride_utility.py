@@ -137,7 +137,7 @@ def get_distance_to_travel(distance_matrix):
 	return distance_matrix[number_of_people-1][:]
 
 
-def create_average_distance_between_sources(source_data):
+def create_average_distance_between_sources(source_data, graph, option):
 	"""
 	Create distance matrix according to distance
 	from sources of each user, the distance value
@@ -148,15 +148,43 @@ def create_average_distance_between_sources(source_data):
 		source_data: Distance matrix of sources 
 		of riders.
 
+		graph: The networkx graph corresponding to
+		each rider in the system.
+
+		option: Has value 0 if average distance between
+		all, and 1 if average distance between admissible
+		riders.
+
 	Returns:
 		A list of distances for each node in the vertex.
 	"""
 	source_distances = []
-	for i in source_data:
-		source_distances.append(sum(i)/len(i))
+	for i, data in enumerate(source_data):
+		if option == 0:
+			source_distances.append(sum(data)/len(data))
+		else:
+			total_sum_for_rider = 0
+			number_of_admissible = 0
+			for j, distance in enumerate(data):
+				if graph.has_edge(i,j) == False:
+					total_sum_for_rider += distance
+					number_of_admissible += 1
 
-
+			source_distances.append(total_sum_for_rider/number_of_admissible)
+			
 	return source_distances
+
+
+def update_positions(active_riders, current_vehicles, time_elapsed, time_start, source_time, destination_time, source_destination_time, source_distance, destination_distance, source_destination_distance):
+
+	passenger_iterator = 0
+	for vehicle in current_vehicles:
+		route = vehicle.route
+		vehicle_start_time = vehicle.time_start
+
+		for i in range(len(vehicle.passengers)):
+			
+
 
 
 if __name__ == '__main__':

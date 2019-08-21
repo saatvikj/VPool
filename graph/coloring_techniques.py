@@ -2,6 +2,7 @@ from __future__ import division
 import networkx as nx 
 import sys
 import operator
+import itertools
 
 
 def weight_sorted_sequential(graph, vertex_order):
@@ -256,5 +257,71 @@ def seq_coloring(graph):
 	return color_classes
 
 
+def optimized_greedy_dsatur_coloring(graph, weight_dictionary):
+	"""
+	An optimized alternative for the function that implements
+	DSATUR based weighted coloring. Optimization being adapted from
+	the networkx implementation of the DSATUR coloring algorithm.
+
+	Args:
+		graph: The networkx graph on which the algorithm is to
+		be applied.
+
+		weight_dictionary: A dictionary representing the weight
+		to be multiplied with each vertex. Key is vertex id, 
+		value is weight.
+
+	Returns:
+		A dictionary containing the color classes of the graph based
+		off the DSATUR based coloring, dictionary maps color index to
+		list of vertices with that color.
+	"""
+	colors = {}
+	nodes = saturation_degree_first(graph, weight_dictionary, colors)
+
+	for u in nodes:
+		# Set to keep track of colors of neighbours
+		neighbour_colors = {colors[v] for v in graph[u] if v in colors}
+		# Find the first unused color.
+		for color in itertools.count():
+			if color not in neighbour_colors:
+				break
+		# Assign the new color to the current node.
+		colors[u] = color
+
+	color_classes = {}
+	for k,v in colors.iteritems():
+		keys = color_classes.setdefault(v,[])
+		keys.append(k)
+	return color_classes
+
+
+def saturation_degree_first(graph, weight_dictionary, colors):
+	"""
+	
+	"""
+	distinct_colors = {v: set() for v in graph}
+	for i in range(len(graph)):
+		# On the first time through, simply choose the node of highest degree.
+		if i == 0:
+			node = max(graph, key=graph.degree)
+			yield node
+			# Add the color 0 to the distinct colors set for each
+			# neighbors of that node.
+			for v in graph[node]:
+				distinct_colors[v].add(0)
+		else:
+			# Compute the maximum saturation and the set of nodes that
+			# achieve that saturation.
+			saturation = {v: len(c)*weight_dictionary[v] for v, c in distinct_colors.items()
+						  if v not in colors}
+			# Yield the node with the highest saturation, and break ties by
+			# degree.
+			node = max(saturation, key=lambda v: (saturation[v], graph.degree(v)))
+			yield node
+			# Update the distinct color sets for the neighbors.
+			color = colors[node]
+			for v in graph[node]:
+				distinct_colors[v].add(color)
 if __name__ == '__main__':
 	pass

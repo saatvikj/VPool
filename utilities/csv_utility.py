@@ -9,8 +9,8 @@ import pandas as pd
 def csv_to_data(csv_file_name, time_start, time_end, port, delta, size_limit):
 	"""
 	Utility function to read content present in csv
-	file written in NYC data format and put into 
-	corresponding files.
+	file written in NYC data format and accordingly
+	create data from it.
 
 	Args:
 		csv_file_name: Path of csv file containing
@@ -57,6 +57,32 @@ def graph_to_csv(pickle_file_name, csv_name):
 	df = pd.DataFrame(data_dictionary['admissibility_matrix'])
 	df.to_csv(csv_name)
 
+
+
+def csv_to_requests(csv_file_name, time_start, time_end):
+	"""
+	Function to read the dataset for all ride requests
+	in the given timeframe so that it can be used to 
+	create dynamic requests.
+
+	Args:
+		csv_file_name: Path of csv file containing
+		data
+
+		time_start: Start time to query the input
+		dataset for data.
+
+		time_end: End time to query the input dataset
+		for data.
+
+	Returns:
+		A list of request objects containing data about
+		the dynamic requests.
+	"""
+	data = nyc.read_dataset(csv_file_name, time_start, time_end)
+	requests = nyc.create_request_objects(data, 2000)
+
+	return requests
 
 if __name__ == '__main__':
 	pass

@@ -78,7 +78,7 @@ def give_best_coloring(graph, iterations):
 	while (iteration < iterations):
 
 		for i in range(1,5):
-			coloring = ct.dsatur_based_weighted_coloring(graph, get_weight_dictionaries(graph, i), copy.deepcopy(nodes_list), greedy_allotment=False)		
+			coloring = ct.optimized_greedy_dsatur_coloring(graph, get_weight_dictionaries(graph, i))
 			coloring_weight = ct.calculate_coloring_weight(graph, coloring)
 
 			if coloring_weight < upper_bound:

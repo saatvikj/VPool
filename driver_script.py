@@ -56,7 +56,7 @@ def vehicles_manifest(four=525.0, six=850.0, twelve=1000.0, thirty_five=3000.0, 
 	return vehicles_list
 
 
-def runner(filename, option, text_output='vechicle_statistics.txt', output=None, time_start='2014-01-01 09:00:00', time_end='2014-01-01 09:05:00', port='127.0.1.1:5000', delta=1.2, size_limit=100):
+def runner(filename, option, text_output='vechicle_statistics.txt', output=None, time_start='2014-01-01 09:59:00', time_end='2014-01-01 10:04:00', port='127.0.1.1:5000', delta=1.2, size_limit=100):
 	"""
 	Main runner function that initializes the graph, 
 	assigns weights to vertices, applies all algorithms 
@@ -128,7 +128,7 @@ def runner(filename, option, text_output='vechicle_statistics.txt', output=None,
 	maximum_distance = max(distance_from_destination)
 	graph = init.create_graph_from_input(adjacency_matrix)
 	rates = rUtils.create_rates_for_slabs(distance_from_destination, slab)
-	average_distances = rUtils.create_average_distance_between_sources(source_data)
+	average_distances = rUtils.create_average_distance_between_sources(source_data, graph, 0)
 	graph = init.add_weight_to_vertices(graph, average_distances)
 	
 	vehicles = vehicles_manifest()
