@@ -182,7 +182,7 @@ def update_positions(active_riders, current_vehicles, time_elapsed, time_start, 
 		route = vehicle.route
 		vehicle_start_time = vehicle.time_start
 
-		for i in range(len(vehicle.passengers)):
+		# for i in range(len(vehicle.passengers)):
 			
 
 
