@@ -178,8 +178,12 @@ def read_dataset(filepath, time_start='2014-01-01 14:00:00', time_end='2014-01-0
 	start_condition = ny_dataset['pickup_datetime'] > time_start
 	end_condition = ny_dataset['pickup_datetime'] < time_end
 	airport_condition = ny_dataset['rate_code'] == 1
+	pickup_latititude_condition = ny_dataset['pickup_latitude'] > 40.0
+	dropoff_latititude_condition = ny_dataset['dropoff_latitude'] > 40.0 	
+	pickup_longitude_condition = ny_dataset['pickup_longitude'] > -75.0
+	dropoff_longitude_condition = ny_dataset['dropoff_longitude'] > -75.0 
 
-	subset = ny_dataset[start_condition & end_condition & airport_condition]
+	subset = ny_dataset[start_condition & end_condition & airport_condition & pickup_latititude_condition & dropoff_latititude_condition & pickup_longitude_condition & dropoff_longitude_condition]
 	return subset
 
 

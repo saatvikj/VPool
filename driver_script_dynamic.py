@@ -1,106 +1,346 @@
-from utilities import csv_utility as cUtils
-from utilities import dynamic_utility as dUtils
-from utilities import ride_utility as rUtils
-from graph import initiate_graph as init
-from graph import weighted_vertex_coloring as wvc
+from datetime import datetime
 from graph import parse_nyc_data as nyc
-from graph import coloring_techniques as ct
-from statistics import distance_statistics as dStats
-from statistics import vehicle_statistics as vStats
-from statistics import coloring_statistics as cStats
-from models.Vehicle import Vehicle, comparator
+import networkx as nx
+import random
+import string
 
 
-def vehicles_manifest(four=525.0, six=850.0, twelve=1000.0, thirty_five=3000.0, forty_one= 3200.0):
-	"""
-	Function to return list of available
-	vehicles as vehicle objects.
+all_vehicles = {}
+all_passengers = {}
+all_ids = []
+
+
+
+def generate_random_id():
+	global all_ids
+
+
+	while True:
+		random = ''.join([random.choice(string.digits) for n in range(5)]) 
+		if random not in all_ids:
+			all_ids.append(random)
+			return int(random)
+
+
+def query_specific_route(vehicle_id):
+	global all_vehicles
+	global all_passengers
+
+
+	vehicle_object = all_vehicles[vehicle_id]
+	starting_point_id = vehicle_object.route[vehicle_object.route_flag]
+
+
+
+
+
+def update_positions_of_active_vehicles(minutes, global_timer):
+	global all_vehicles
+	global all_passengers
+
+	vehicle_items = all_vehicles.items()
+	passenger_items = all_passengers.items()
+
+	id_to_index_passenger_mapping = [passenger[0] for passenger in passenger_items if passenger.is_active == 1]
+	vehicles_requiring_position_updates = [vehicle[1] for vehicle in vehicle_items if vehicle[1].is_active == 1]
+
+	source_time_data, destination_time_data, source_destination_time_data = get_time_matrices()
+	source_distance_data, destination_distance_data, source_destination_distance_data = get_distance_matrices()
+
+	for vehicle_object in vehicles_requiring_position_updates:
+
+		previous_route_flag = vehicle_object.route_flag
+		current_position_id = int(vehicle_object.route[route_flag])
+
+		update_iteration_timer = 0
+		marker = previous_route_flag + 1
+
+		#First get to nearest pair of nodes in the route
+		while update_iteration_timer < minutes*60 and marker < len(vehicle_object.route):
+
+			time_for_this_stop = 0
+			
+			if marker >= len(vehicle_object.route):
+				#End of route
+
+			else:
+				passenger_id_for_current_waypoint = vehicle_object.route[marker-1]
+				passenger_id_for_next_waypoint = vehicle_object.route[marker]
+				current_position_type = vehicle_object.waypoint_type[marker-1]
+				next_position_type = vehicle_object.waypoint_type[marker]
+
+				
+
+				if current_position_type == 'S' and next_position_type == 'S':
+					time_for_this_stop = source_time_data[][]
+					global_timer = global_timer + datetime.timedelta(seconds=time_for_this_stop)
+
+					vehicle_object.distance_traveled += source_distance_data[][]
+					all_passengers[passenger_id_for_current_waypoint].distance_traveled += source_distance_data[][]
+					all_passengers[passenger_id_for_next_waypoint].pickup_time = global_timer
+					all_passengers[passenger_id_for_next_waypoint].is_active = 1
+					all_passengers[passenger_id_for_next_waypoint].car_status = 1
+
+				elif current_position_type == 'S' and next_position_type == 'D':
+					time_for_this_stop = source_destination_time_data[][]
+					global_timer = global_timer + datetime.timedelta(seconds=time_for_this_stop)
+
+					vehicle_object.distance_traveled += source_destination_distance_data[][]
+					all_passengers[passenger_id_for_current_waypoint].distance_traveled += source_destination_distance_data[][]
+					all_passengers[passenger_id_for_next_waypoint].dropoff_time = global_timer
+					all_passengers[passenger_id_for_next_waypoint].is_active = 0
+
+				elif current_position_type == 'D' and next_position_type == 'S':
+					time_for_this_stop = source_destination_time_data[][]
+					global_timer = global_timer + datetime.timedelta(seconds=time_for_this_stop)
+
+					vehicle_object.distance_traveled += source_destination_distance_data[][]
+					all_passengers[passenger_id_for_current_waypoint].distance_traveled += source_destination_distance_data[][]
+					all_passengers[passenger_id_for_next_waypoint].pickup_time = global_timer
+					all_passengers[passenger_id_for_next_waypoint].is_active = 1
+					all_passengers[passenger_id_for_next_waypoint].car_status = 1
+
+				else:
+					time_for_this_stop = destination_time_data[][]
+					global_timer = global_timer = datetime.timedelta(seconds=time_for_this_stop)
+
+					vehicle_object.distance_traveled += destination_distance_data[][]
+					all_passengers[passenger_id_for_current_waypoint].distance_traveled += destination_distance_data[][]
+					all_passengers[passenger_id_for_next_waypoint].dropoff_time = global_timer
+					all_passengers[passenger_id_for_next_waypoint].is_active = 0
+
+				marker += 1
+
+				update_iteration_timer += time_for_this_stop
+
+			global_timer = global_timer - datetime.timedelta(seconds=time_for_this_stop)
+			update_iteration_timer -= time_for_this_stop
+			vehicle_object.route_flag = marker-2
+
+		distances, times, locations = query_specific_route(vehicle_object.vehicle_id)
+		
+		time_left = minutes*60 - update_iteration_timer
+
+		specific_location_timer = 0
+		iterator = 0
+
+		while specific_location_timer <= time_left:
+			specific_location_timer += times[iterator]
+			iterator += 1
+
+		vehicle_object.current_position = locations[iterator-1]
+
+		for passenger_object in vehicle_object.passengers:
+			if passenger_object.is_active == 1 and passenger_object.car_status == 1:
+				passenger_object.current_position = vehicle_object.current_position
+
+
+def set_routes_for_vehicles(text_output):
+
+	global all_vehicles
+	global all_passengers
+
+	vehicle_items = all_vehicles.items()
+	vehicles_requiring_route_updates = [vehicle[1] for vehicle in vehicle_items if vehicle[1].is_active == 1 and vehicle[1].update_required == 1]
+
+	for vehicle_object in vehicles_requiring_route_updates:
+		file_contents = []
+		file_contents.append(str(len(vehicle_object.passengers))+'\n')
+		file_contents.append(str(vehicle_object.capacity)+'\n')
+
+		occupants_string = ""
+		for user in vehicle.passengers:
+			occupants_string = occupants_string + str(user.passenger_id) +','
+		occupants_string = occupants_string[:len(occupants_string)-1]
+
+		file_contents.append(occupants_string+'\n')
+
+		file_contents.append(",".join(vehicle_object.current_position))
+
+		#First put sources of passengers
+		for user in vehicle_object.passengers:
+			if user.car_status == 1:
+				file_contents.append(",".join(vehicle_object.current_position))
+			else:
+				file_contents.append(",".join(user.source_location))
+
+		#Then put destination of passengers
+		for user in vehicle_object.passengers:
+			file_contents.append(",".join(user.destination_location))
+
+		file = open(text_output,"w+")
+		file.writelines(file_contents)
+		file.close()
+
+		query_string = 'java -jar vehicle_routing.jar ' + text_output
+		route = os.popen(query_string).read()
+
+		vehicle_object.route = route.split(" ")
+
+
+def add_new_vehicles(vehicle_allocation, graph):
+
+	global all_vehicles
+	global all_passengers
+
+	information = nx.get_node_attributes(graph, 'information')
+
+	for car in vehicle_allocation:
+
+		#First see if there are any idle vehicles available of same capcity
+		vehicle_items = all_vehicles.items()
+		inactive_vehicles_of_same_capacity = [vehicle[1] for vehicle in vehicle_items if vehicle[1].is_active == 0 and vehicle[1].capacity == car.capacity]
+
+
+		#If available, add passengers to that vehicle and make it active
+		if len(inactive_vehicles_of_same_capacity) > 0:
+			vehicle_object = inactive_vehicles_of_same_capacity[0]
+			vehicle_object.is_active = 1
+			vehicle_object.update_required = 1
+
+		#Else create a new vehicle object required to do the computation and add to all vehicles
+		else:
+			vehicle_object = Cab(generate_random_id(), car.capacity, car.cost, [], [], 0, [], 1, 1, 0, [])
+			all_vehicles[vehicle_object.unique_id] = vehicle_object
+
+		#Create the passenger list from the obtained index from the allocation
+		passengers_list = []
+		for passenger in car.passengers:
+			passenger_id = information[passenger][1]
+			passenger_object = all_passengers[passenger_id]
+			passenger_object.alloted_vehicle = vehicle_object.unique_id
+			passenger_object.is_active = 1
+			passengers_list.append(passenger_object)
+
+
+		#Add passengers to the vehicle
+		vehicle_object.passengers = passengers_list
+
+
+def allot_vehicles_to_color_classes(color_classes, graph):
+
+	global all_vehicles
+	global all_passengers
+
+	for color_class in color_classes:
+
+		#Get information about the graph nodes
+		information = nx.get_node_attributes(graph, 'information')
+
+		#Initiate all the vehicles and passengers in the given color class.
+		class_vehicles = []
+		class_passengers = []
+
+		#Find all passengers and vehicles and fill the lists.
+		for node in color_class:
+			if information[node][0] == 1:
+				class_vehicles.append(node)
+			else:
+				class_passengers.append(node)
+
+		class_passengers_iterator = 0
+		class_vehicles_iterator = 0
+
+		#First fill all vehicles, so iterate over all vehicles
+		while class_vehicles_iterator != len(class_vehicles):
+
+			#Find the vehicle object for current iteration
+			vehicle_index = class_vehicles[class_vehicles_iterator]
+			vehicle_id = information[vehicle_index][1]
+			vehicle_object = all_vehicles[vehicle_id]
+
+
+			#If the vehicle has space then till the time it can be filled, add passengers.
+			if len(vehicle_object.passengers) < vehicle_object.capacity:
+				while len(vehicle_object.passengers) != vehicle_object.capacity:
+
+
+					#If passengers are available to fill, fill them.
+					if class_passengers_iterator < len(class_passengers):
+
+						#Find the passenger object for current index
+						passenger_index = class_passengers[class_passengers_iterator]
+						passenger_id = information[passenger_index][1]
+						passenger_object = all_passengers[passenger_id]
+
+						#Add passenger object as passenger to the vehicle and increment to next passenger.
+						vehicle_object.passengers.append(passenger_object)
+						passenger_object.alloted_vehicle = vehicle_id
+						passenger_object.is_active = 1
+
+						class_passengers_iterator += 1
+
+						#Update flag of route update required to indicate vehicle route needs to be updated.
+						vehicle_object.update_required = 1
+
+			class_vehicles_iterator += 1
+
+		if class_passengers_iterator < len(class_passengers):
+			remaining_passengers = class_passengers[class_passengers_iterator:]
+			cost, vehicle_allocation = iva.allot_vehicles(remaining_passengers, vehicle_list)
+			add_new_vehicles(vehicle_allocation)
+
+
+def get_first_requests(filepath, start_time, end_time, first_number):
+	data = nyc.read_dataset(filepath, start_time, end_time)
+	requests = nyc.create_request_objects(data, first_number)
+
+	return requests
 	
-	Args:
-		four (optional): The running cost of 4 seater vehicle.
-
-		six (optional): The running cost of 6 seater vehicle.
-
-		twelve (optional): The running cost of 12 seater vehicle.
-
-		thirty_five (optional): The running cost of 35 seater vehicle.
-
-		forty_one (optional): The running cost of 41 seater vehicle.
-
-	Returns:
-		List of vehicle objects with given
-		specifications.
-	"""
-	vehicle_1 = Vehicle(1,4,four)
-	vehicle_2 = Vehicle(2,6,six)
-	vehicle_3 = Vehicle(3,12,twelve)
-	vehicle_4 = Vehicle(4,35,thirty_five)
-	vehicle_5 = Vehicle(5,41,forty_one)
-
-	vehicles_list = []
-	vehicles_list.append(vehicle_1)
-	vehicles_list.append(vehicle_2)
-	vehicles_list.append(vehicle_3)
-	vehicles_list.append(vehicle_4)	
-	vehicles_list.append(vehicle_5)
-
-	return vehicles_list
 
 
-def dynamic_simulation_runner(filename, option, time_start, time_end):
+def runner(filepath, start_time, end_time, initial_number, iteration_number, goal_number, delta, minutes):
+	
+	global all_vehicles
+	global all_passengers
 
-	all_requests = cUtils.csv_to_requests(filename)
-	time_elapsed = 0
+	#Get first requests
+	requests = get_first_requests(filepath, start_time, end_time, initial_number)
+	vehicles = []
 
-	current_time = dUtils.convert_to_datetime(time_start)
-	time_end = dUtils.convert_to_datetime(time_end)
+	#Create admissibility matrix from the data
+	source_distance_data, destination_distance_data, source_destination_distance_data = get_distance_matrices(requests, vehicles)
+	admissibility_matrix = create_admissibility_matrix(source_distance_data, destination_distance_data, source_destination_distance_data, delta, requests, vehicles)
 
-	active_riders = []
-	new_requests = []
-	current_vehicles = []
+	#Create properties for nodes (Weights, type and ID)
+	node_type_properties = create_node_properties(requests, vehicles)
+	weights = create_weights(requests, vehicles, source_distance_data, destination_distance_data, source_destination_distance_data)
+	
+	#Create graph and color it
+	graph = create_graph_from_admissibility_matrix(admissibility_matrix, node_properties, weights)
+	color_classes = weighted_vertex_coloring(graph)
 
-	source_distance = [[]]
-	destination_distance = [[]]
-	source_destination_distance = [[]]
+	#Allot vehicles to color classes
+	allot_vehicles_to_color_classes(color_classes, graph)
 
-	source_time = [[]]
-	destination_time = [[]]
-	source_destination_time = [[]]
+	#Allot routes to vehicles
+	set_routes_for_vehicles(text_output)
 
-	while current_time != time_end:
+	request_counter = len(requests)
 
-		#Update active riders list, if an existing rider has finished ride in last checked time, he/she is removed 
-		#Checks current position according to rider start time, rider vehicle and time elapsed and then updates their
-		#positions as well. Position will be updated by seeing current position, how much time has passed and how much
-		#time it takes from going to different points in the vehicle route.
-		active_riders = rUtils.update_positions(active_riders, current_vehicles, time_elapsed, time_start, source_time, destination_time, source_destination_time, source_distance, destination_distance, source_destination_distance)
+	global_timer = end_time
 
-		#Select all new requests made since previous time
-		#Selects by giving start time and end time
-		new_requests = cUtils.find_new_requests(all_requests, time_start+time_elapsed, time_start+time_elapsed+5 minutes)
+	while request_counter >= goal_number:
 
-		#Update active vehicles list, if all riders of vehicle have finished ride, vehicle is removed from system
-		#Updates by checking if all riders of vehicle have been removed from active riders or not
-		#Later will be used to keep track of required number of vehicles
-		current_vehicles = rUtils.update_vehicles(current_vehicles, active_riders)
 
-		#Create the distance and time matrices corresponding to all the riders
-		#From riders it will then be upgraded to vehicle based admissibility
-		source_distance, destination_distance, source_destination_distance = rUtils.get_distance_data(active_riders, new_requests) 
-		source_time, destination_time, source_destination_time = rUtils.get_time_data(active_riders, new_requests)
+		#Update positions since last x minutes
+		update_positions_of_active_vehicles(minutes)
 
-		adjacency_matrix, node_type = dUtils.create_vehicle_rider_adjacency_matrix(source_distance, destination_distance, source_destination_distance, new_requests, active_riders)
-		graph = init.initiate_dyanmic_graph(adjacency_matrix, node_type)
+		#Get new requests
+		requests = get_new_requests(global_timer, iteration_number)
 
-		rates = rUtils.create_rates_for_slabs(distance_from_destination, slab)
-		average_distances = rUtils.create_average_distance_between_sources(source_distance, graph, 0)
-		average_distances = rUtils.create_weights_with_vehicles(average_distances, current_vehicles)
+		#Create graph
 
-		graph = init.add_weight_to_vertices(graph, average_distances)
 
-		weight, coloring = wvc.give_best_coloring(graph, 10)
-		wvc_results = cStats.coloring_statistics(coloring, vehicles, distance_from_destination, source_distance, destination_distance, source_destination_distance, copy.deepcopy(rates), requests, text_output, 'wvc','12.972442,77.580643\n')
+		#Call coloring routine
 
-		standard_coloring = ct.dsatur_coloring(graph)
-		standard_weight = ct.calculate_coloring_weight(graph, standard_coloring)
-		standard_coloring_results = cStats.coloring_statistics(standard_coloring, vehicles, distance_from_destination, source_distance, destination_distance, source_destination_distance, copy.deepcopy(rates), requests, text_output, 'std','12.972442,77.580643\n')
+
+		#Calculate routes
+		set_routes_for_vehicles(text_output)
+
+		request_counter += iteration_number
+
+
+
+if __name__ == '__main__':
+	runner()

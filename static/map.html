@@ -66,13 +66,13 @@
 						<li><a href="#" style="color: #FCD736">Passengers:	{{ vehicle[5] }}</a></li>
 					</ol>
 				</div>
-				<h2 class="slider-headings">Currently Chosen</h2>
+<!-- 				<h2 class="slider-headings">Currently Chosen</h2>
 				<div class="list-type4">
 					<ol>
 						<li><a href="#" style="color: #FCD736;">Vehicle Number {{ number }}</a></li>
 						<li><a href="#" style="color: #FCD736;">Coloring Type: {{ coloring }}</a></li>
 					</ol>
-				</div>
+				</div> -->
 				<h2 class="slider-headings">Select New Vehicle</h2>
 				<form action="/results" method="POST">
 					<div class="form-option">
@@ -125,13 +125,22 @@
 				var popups = {{ popup | tojson }};
 				var order = {{ order | tojson }};
 				var i;
-				var greenIcon = new L.Icon({
-				  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+				var destIcon = new L.Icon({
+				  iconUrl: 'https://cdn0.iconfinder.com/data/icons/crown-5/154/finish-start-goal-location-512.png',
 				  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-				  iconSize: [25, 41],
-				  iconAnchor: [12, 41],
+				  iconSize: [40, 40],
+				  iconAnchor: [11, 40],
 				  popupAnchor: [1, -34],
-				  shadowSize: [41, 41]
+				  shadowSize: [40, 40]
+				});
+
+				var sourceIcon = new L.Icon({
+				  iconUrl: 'https://cdn3.iconfinder.com/data/icons/pin-4/100/pin-512.png',
+				  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+				  iconSize: [40, 40],
+				  iconAnchor: [11, 40],
+				  popupAnchor: [1, -34],
+				  shadowSize: [40, 40]
 				});
 			
 				var control = L.Routing.control({
@@ -139,13 +148,18 @@
 					routeer: L.Routing.mapbox('pk.eyJ1Ijoic2FhdHZpa2oiLCJhIjoiY2pyOHV6NHRxMDE3YjN6bDliM2N5ZGd1aSJ9.xXEL06DYefip4LVCVMZGWQ'),
 					waypointMode: 'snap',
 					createMarker: function (i, start) {
-						if (i == 0) {
-							var marker = L.marker(start.latLng, {icon: greenIcon});
-							marker.bindPopup(popups[i].concat("<br> This is the starting point of the route.")).openPopup();
+						if (order[i] == 'D') {
+							var marker = L.marker(start.latLng, {icon: destIcon});
 							return marker
 						} else {
-							var marker = L.marker(start.latLng);
-							marker.bindPopup(popups[i]);
+							var marker = L.marker(start.latLng, {icon: sourceIcon});
+
+							if (i == 0) {
+								marker.bindPopup(popups[i].concat("<br> This is the starting point of the route.")).openPopup();
+							} else {
+								marker.bindPopup(popups[i]);
+							}
+
 							return marker
 						}
 					}
