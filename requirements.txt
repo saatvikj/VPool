@@ -24,7 +24,7 @@ Jinja2==2.10
 jsonschema==2.6.0
 jupyter-core==4.4.0
 kiwisolver==1.0.1
-Mako==1.0.10
+Mako==1.2.2
 Markdown==2.4.1
 MarkupSafe==1.1.0
 matplotlib==2.2.3
